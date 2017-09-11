@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Jash</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="/jquery-2.2.4.js"></script>
+    <script src="/tasks.js"></script>
+
+    <script src="/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/bootstrap.min.css" />
+    <link rel="stylesheet" href="/bootstrap-theme.min.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="toolbar" style="margin-bottom: 5px">
+            <form action="/" method="GET">
+                <div class="filter-container" style="float:left; margin-right: 5px">
+                    责任人:
+                    <select id="filterByMan" name="man">
+                        <option value="">所有人</option>
+                        <div th:each="man : ${fullProject.men}">
+                            <div th:if="${man == selectedMan}">
+                                <option selected="selected" th:text="${man}"></option>
+                            </div>
+                            <div th:unless="${man == selectedMan}">
+                                <option th:text="${man}"></option>
+                            </div>
+                        </div>
+                    </select>
+                </div>
+
+                <div style="float:left; margin-right: 5px">
+                    显示任务类型:
+                    <select id="filterByTaskStatus" name="status">
+                        <div th:if="${'All' == selectedStatus}">
+                            <option selected="selected" value="All">所有</option>
+                        </div>
+                        <div th:unless="${'All' == selectedStatus}">
+                            <option value="All">所有</option>
+                        </div>
+
+
+                        <div th:if="${'NotCompleted' == selectedStatus}">
+                            <option selected="selected" value="NotCompleted">未完成的</option>
+                        </div>
+                        <div th:unless="${'NotCompleted' == selectedStatus}">
+                            <option value="NotCompleted">未完成的</option>
+                        </div>
+
+                        <div th:if="${'Completed' == selectedStatus}">
+                            <option selected="selected" value="Completed">完成的</option>
+                        </div>
+                        <div th:unless="${'Completed' == selectedStatus}">
+                            <option value="Completed">完成的</option>
+                        </div>
+
+                    </select>
+                </div>
+                <div>
+                    <input type="submit" value="GO" />
+                </div>
+            </form>
+        </div>
+
+        <div id="tabs">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#gantt" aria-controls="gantt" role="tab" data-toggle="tab">任务列表</a>
+                </li>
+                <li role="presentation">
+                    <a href="#summary" aria-controls="profile" role="tab" data-toggle="tab">统计信息</a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane active" id="gantt" role="tabpanel" style="margin-top: 5px">
+
+                    <div th:with="stat=${project.getTotalStat()}"
+                         class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="60"
+                         aria-valuemin="0" aria-valuemax="100"
+                         th:attr="style='border: 1px; height:20px; width: ' + ${stat.progress} + '%'">
+                        <span th:text="${stat.progress}"></span>%
+                    </div>
+
+                    <table id="my-table" class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>任务</th>
+                            <th>人日</th>
+                            <th>负责人</th>
+                            <th>开始时间</th>
+                            <th>结束时间</th>
+                            <th>进度</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="task : ${project.tasks}">
+                            <td th:text="${task.name}"></td>
+                            <td th:text="${task.cost / 2.0}"></td>
+                            <td th:text="${task.owner}"></td>
+                            <td th:text="${task.startDate}"></td>
+                            <td th:text="${task.endDate}"></td>
+                            <div th:switch="${task.progress == 100}">
+                                <td th:case="true" class="success">
+                                    ✔
+                                </td>
+                                <div th:case="false" class="info">
+                                    <div th:switch="${task.delayed}">
+                                        <td th:case="true" class="danger">
+                                            <span th:text="${task.progress}"></span>%
+                                        </td>
+                                        <td th:case="false" class="info">
+                                            <span th:text="${task.progress}"></span>%
+                                        </td>
+                                    </div>
+                                </div>
+                            </div>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- summary table -->
+                <div class="tab-pane" id="summary" role="tabpanel">
+                    <table id="summary-table" class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>责任人</th>
+                            <th>总人日</th>
+                            <th>已完成人日</th>
+                            <th width="70%">进度</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="man : ${project.men}"
+                            th:with="stat=${project.getUserStat(man)}">
+                            <td th:text="${man}"></td>
+                            <td th:text="${stat.totalCost / 2}"></td>
+                            <td th:text="${stat.finishedCost / 2}"></td>
+                            <td width="70%">
+                                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="60"
+                                     aria-valuemin="0" aria-valuemax="100"
+                                     th:attr="style='height:20px; width: ' + ${stat.progress} + '%'">
+                                    <span th:text="${stat.progress}"></span>%
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- 总状态 -->
+                        <tr th:with="stat=${project.getTotalStat()}">
+                            <td th:text="${stat.user}"></td>
+                            <td th:text="${stat.totalCost / 2}"></td>
+                            <td th:text="${stat.finishedCost / 2}"></td>
+                            <td>
+                                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="60"
+                                     aria-valuemin="0" aria-valuemax="100"
+                                     th:attr="style='height:20px; width: ' + ${stat.progress} + '%'">
+                                    <span th:text="${stat.progress}"></span>%
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
