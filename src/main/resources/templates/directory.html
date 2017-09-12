@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Jash</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="/jquery-2.2.4.js"></script>
+    <script src="/tasks.js"></script>
+
+    <script src="/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/bootstrap.min.css" />
+    <link rel="stylesheet" href="/bootstrap-theme.min.css" />
+
+    <link rel="stylesheet" href="/main.css" />
+    <style>
+	.markdown-body {
+		box-sizing: border-box;
+		min-width: 200px;
+		max-width: 980px;
+		margin: 0 auto;
+		padding: 45px;
+	}
+
+	@media (max-width: 767px) {
+		.markdown-body {
+			padding: 15px;
+		}
+	}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ol class="breadcrumb" style="float:left;position:relative;top:10px">
+                        <li th:each="file : ${breadcrumb.links}">
+                            <a th:if="${file.isDir()}" th:text="${file.name}" th:attr='href=${file.url}'></a>
+                            <span th:unless="${file.isDir()}" th:text="${file.name}"></span>
+                        </li>
+                    </ol>
+
+                    <ul class="nav navbar-nav" style="float:right">
+                        <form class="navbar-form navbar-left" role="search" action="/search" method="GET">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search" name="w" />
+                            </div>
+                            <button type="submit" class="btn btn-default">Search</button>
+                        </form>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+    </div>
+    <ul class="list-group" th:each="file : ${files}" style="margin-bottom:0px">
+        <li class="list-group-item">
+            <div th:if="${file.isDir()}">
+                <i class="glyphicon glyphicon-folder-close"></i>
+                <a th:text="${file.name}"
+                   th:attr='href=${file.url},alt=${file.url}'>
+                </a>
+            </div>
+
+            <div th:unless="${file.isDir()}">
+                <i class="glyphicon glyphicon-file"></i>
+                <a th:text="${file.name}"
+                   th:attr='href=${file.url},alt=${file.url}'>
+                </a>
+            </div>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

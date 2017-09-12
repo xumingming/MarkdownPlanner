@@ -62,7 +62,7 @@ public class Parser {
     return null;
   }
 
-  public String parseHeader(String str) {
+  public static String parseHeader(String str) {
     Matcher matcher = HEADER_PATTERN.matcher(str);
     if (matcher.matches()) {
       return matcher.group(2).trim();

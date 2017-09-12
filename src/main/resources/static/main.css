@@ -1,0 +1,14 @@
+.layout-middle {
+    height: 50vh;
+    margin-top:15vh;
+}
+
+.glyphicon {
+    color: #999;
+    padding-right: 5px;
+}
+
+.error {
+    color: #F00;
+    font-size: 20px;
+}
