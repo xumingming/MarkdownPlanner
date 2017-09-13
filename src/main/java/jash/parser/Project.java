@@ -9,24 +9,22 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import jash.parser.ProjectStat.UserStat;
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import lombok.experimental.FieldDefaults;
 
 /**
  *
  */
 @Getter
-@FieldDefaults(makeFinal=true, level= AccessLevel.PRIVATE)
 @ToString
-@EqualsAndHashCode(exclude = {"userStats"})
+@EqualsAndHashCode(exclude = {"stat"})
 public class Project {
     private LocalDate projectStartDate;
     private List<Task> tasks;
     private List<Vacation> vacations;
-    private Map<String, UserStat> userStats = new HashMap<>();
+    private ProjectStat stat;
+
 
     public Project(LocalDate projectStartDate, List<Task> tasks, List<Vacation> vacations) {
         this.projectStartDate = projectStartDate;
@@ -68,6 +66,7 @@ public class Project {
 
     private void init() {
         Map<String, List<Task>> user2Tasks = new HashMap<>();
+        Map<String, UserStat> userStats = new HashMap<>();
         this.tasks.forEach(task -> {
             task.setProjectStartDate(projectStartDate);
 
@@ -81,10 +80,13 @@ public class Project {
             }
 
             UserStat stat = userStats.get(user);
+            stat.setUser(user);
             stat.addTotalCost(task.getCost());
             stat.addFinishedCost(task.getCost() * task.getProgress() / 100);
             user2Tasks.get(user).add(task);
         });
+
+        stat = new ProjectStat(userStats);
 
         user2Tasks.keySet().stream().forEach(user -> {
             List<Task> tasks = user2Tasks.get(user);
@@ -155,18 +157,10 @@ public class Project {
     }
 
     public UserStat getUserStat(String user) {
-        return userStats.get(user);
+        return stat.getUserStat(user);
     }
 
     public UserStat getTotalStat() {
-        UserStat totalStat = new UserStat();
-        totalStat.setUser("-- 总记 --");
-        userStats.values().stream()
-            .forEach(stat -> {
-                totalStat.addTotalCost(stat.getTotalCost());
-                totalStat.addFinishedCost(stat.getFinishedCost());
-            });
-
-        return totalStat;
+        return stat.getTotalStat();
     }
 }

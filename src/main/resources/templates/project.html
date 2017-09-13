@@ -5,7 +5,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <script src="/jquery-2.2.4.js"></script>
     <script src="/tasks.js"></script>
+    <script src="/stat.js"></script>
+    <link rel="stylesheet" href="/markdown.css" />
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.js" />
     <script src="/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/bootstrap.min.css" />
     <link rel="stylesheet" href="/bootstrap-theme.min.css" />
@@ -28,6 +31,7 @@
 </head>
 <body>
     <div class="container">
+        <input type="hidden" id="path" th:attr="value=${path}" />
         <div>
             <nav class="navbar navbar-default">
                 <div class="container-fluid">
@@ -107,18 +111,66 @@
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active">
-                    <a href="#gantt" aria-controls="gantt" role="tab" data-toggle="tab">任务列表</a>
+                    <a href="#summary" aria-controls="profile" role="tab" data-toggle="tab">统计信息</a>
                 </li>
                 <li role="presentation">
-                    <a href="#summary" aria-controls="profile" role="tab" data-toggle="tab">统计信息</a>
+                    <a href="#tasks" aria-controls="tasks" role="tab" data-toggle="tab">任务列表</a>
+                </li>
+                <li role="presentation">
+                    <a href="#markdown" aria-controls="markdown" role="tab" data-toggle="tab">Markdown</a>
                 </li>
             </ul>
 
             <!-- Tab panes -->
             <div class="tab-content">
-                <div class="tab-pane active" id="gantt" role="tabpanel" style="margin-top: 5px">
+                <!-- summary tab -->
+                <div class="tab-pane active" id="summary" role="tabpanel">
+                    <table id="summary-table" class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>责任人</th>
+                            <th>总人日</th>
+                            <th>已完成人日</th>
+                            <th width="70%">进度</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="man : ${fullProject.men}"
+                            th:with="stat=${fullProject.getUserStat(man)}">
+                            <td th:text="${man}"></td>
+                            <td th:text="${stat.totalCost / 2}"></td>
+                            <td th:text="${stat.finishedCost / 2}"></td>
+                            <td width="70%">
+                                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="60"
+                                     aria-valuemin="0" aria-valuemax="100"
+                                     th:attr="style='height:20px; width: ' + ${stat.progress} + '%'">
+                                    <span th:text="${stat.progress}"></span>%
+                                </div>
+                            </td>
+                        </tr>
 
-                    <div th:with="stat=${project.getTotalStat()}"
+                        <!-- 总状态 -->
+                        <tr th:with="stat=${fullProject.getTotalStat()}">
+                            <td th:text="${stat.user}"></td>
+                            <td th:text="${stat.totalCost / 2}"></td>
+                            <td th:text="${stat.finishedCost / 2}"></td>
+                            <td>
+                                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="60"
+                                     aria-valuemin="0" aria-valuemax="100"
+                                     th:attr="style='height:20px; width: ' + ${stat.progress} + '%'">
+                                    <span th:text="${stat.progress}"></span>%
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <h2>未完成任务比例</h2>
+                    <canvas id="myChart" width="200" height="100" class="well"></canvas>
+                </div>
+
+                <div class="tab-pane" id="tasks" role="tabpanel" style="margin-top: 5px">
+                    <div th:with="stat=${fullProject.getTotalStat()}"
                          class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="60"
                          aria-valuemin="0" aria-valuemax="100"
                          th:attr="style='border: 1px; height:20px; width: ' + ${stat.progress} + '%'">
@@ -163,47 +215,8 @@
                     </table>
                 </div>
 
-                <!-- summary table -->
-                <div class="tab-pane" id="summary" role="tabpanel">
-                    <table id="summary-table" class="table table-bordered">
-                        <thead>
-                        <tr>
-                            <th>责任人</th>
-                            <th>总人日</th>
-                            <th>已完成人日</th>
-                            <th width="70%">进度</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="man : ${project.men}"
-                            th:with="stat=${project.getUserStat(man)}">
-                            <td th:text="${man}"></td>
-                            <td th:text="${stat.totalCost / 2}"></td>
-                            <td th:text="${stat.finishedCost / 2}"></td>
-                            <td width="70%">
-                                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="60"
-                                     aria-valuemin="0" aria-valuemax="100"
-                                     th:attr="style='height:20px; width: ' + ${stat.progress} + '%'">
-                                    <span th:text="${stat.progress}"></span>%
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- 总状态 -->
-                        <tr th:with="stat=${project.getTotalStat()}">
-                            <td th:text="${stat.user}"></td>
-                            <td th:text="${stat.totalCost / 2}"></td>
-                            <td th:text="${stat.finishedCost / 2}"></td>
-                            <td>
-                                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="60"
-                                     aria-valuemin="0" aria-valuemax="100"
-                                     th:attr="style='height:20px; width: ' + ${stat.progress} + '%'">
-                                    <span th:text="${stat.progress}"></span>%
-                                </div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div class="tab-pane" id="markdown" role="tabpanel">
+                    <article class="markdown-body" th:utext="${article}"></article>
                 </div>
             </div>
         </div>

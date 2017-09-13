@@ -2,6 +2,7 @@ package jash.web;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,14 +10,15 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import com.vladsch.flexmark.ast.Node;
+import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
-import com.vladsch.flexmark.ext.toc.TocExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.util.options.MutableDataHolder;
 import com.vladsch.flexmark.util.options.MutableDataSet;
 import jash.Application;
 import jash.parser.Parser;
 import jash.parser.Project;
+import jash.parser.ProjectStat.PercentageStat;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.HandlerMapping;
 
 import static jash.Utils.getFileDisplayName;
@@ -61,6 +64,20 @@ public class ProjectController {
         return "directory";
     }
 
+    @RequestMapping(value = "/**/*.plan.md.json")
+    public @ResponseBody
+    PercentageStat projectJson(HttpServletRequest req) throws Exception {
+        String filePath = getCurrentFilePath(req);
+        filePath = filePath.substring(0, filePath.length() - 5);
+
+        try (FileInputStream stream = new FileInputStream(filePath)) {
+            List<String> lines = IOUtils.readLines(stream, "UTF-8");
+            Parser parser = new Parser();
+            Project fullProject = parser.parse(lines);
+            return fullProject.getStat().getNotFinishedStat();
+        }
+    }
+
     @RequestMapping(value = "/**/*.plan.md")
     public String project(HttpServletRequest req,
         @RequestParam(required = false) String status,
@@ -73,48 +90,61 @@ public class ProjectController {
             Project fullProject = parser.parse(lines);
             model.addAttribute("fullProject", fullProject);
 
-            Project project = fullProject;
-            if (status != null) {
-                switch (status) {
-                    case "Completed":
-                        project = project.hideNotCompleted();
-                        break;
-                    case "NotCompleted":
-                        project = project.hideCompleted();
-                        break;
-                    case "All":
-                    default:
-                        break;
-                }
-            }
+            Project project = filterProject(fullProject, man, status);
 
-            if (StringUtils.isNotBlank(man)) {
-                project = project.onlyShowTaskForUser(man);
-            }
-
+            model.addAttribute("path",
+                req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
             model.addAttribute("project", project);
             model.addAttribute("selectedMan", man);
             model.addAttribute("selectedStatus", status);
-
             model.addAttribute("breadcrumb", new BreadcrumVO(Application.ROOT, filePath));
-            return "project";
+            model.addAttribute("article", renderMarkdown(filePath));
         }
+
+        return "project";
+    }
+
+    private Project filterProject(Project fullProject, @RequestParam(required = false) String man,
+        @RequestParam(required = false) String status) {
+        Project project = fullProject;
+        if (status != null) {
+            switch (status) {
+                case "Completed":
+                    project = project.hideNotCompleted();
+                    break;
+                case "NotCompleted":
+                    project = project.hideCompleted();
+                    break;
+                case "All":
+                default:
+                    break;
+            }
+        }
+
+        if (StringUtils.isNotBlank(man)) {
+            project = project.onlyShowTaskForUser(man);
+        }
+        return project;
     }
 
     @RequestMapping(path = {"/**/*.md"}, produces = "text/html")
-    public String java(Model model, HttpServletRequest req) throws Exception {
+    public String markdown(Model model, HttpServletRequest req) throws Exception {
         String filePath = getCurrentFilePath(req);
 
+        String html = renderMarkdown(filePath);
+        model.addAttribute("article", html);
+        model.addAttribute("breadcrumb", new BreadcrumVO(Application.ROOT, filePath));
+        return "markdown";
+    }
+
+    private String renderMarkdown(String filePath) throws IOException {
         final MutableDataHolder OPTIONS = new MutableDataSet()
             .set(HtmlRenderer.INDENT_SIZE, 2)
             .set(HtmlRenderer.PERCENT_ENCODE_URLS, true)
-
-            // for full GFM table compatibility add the following table extension options:
-            .set(TablesExtension.COLUMN_SPANS, false)
-            .set(TablesExtension.APPEND_MISSING_COLUMNS, true)
-            .set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
-            .set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
-            .set(TocExtension.IS_TEXT_ONLY, false)
+            .set(
+                com.vladsch.flexmark.parser.Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(),
+                    StrikethroughExtension.create())
+            )
             ;
         com.vladsch.flexmark.parser.Parser parser =
             com.vladsch.flexmark.parser.Parser.builder(OPTIONS).build();
@@ -122,11 +152,8 @@ public class ProjectController {
             FileUtils.readLines(new File(filePath), "UTF-8")
             .stream().collect(Collectors.joining("\n"))
         );
-        HtmlRenderer renderer = HtmlRenderer.builder().build();
-        String html = renderer.render(document);  // "<p>This is <em>Sparta</em></p>\n"
-        model.addAttribute("article", html);
-        model.addAttribute("breadcrumb", new BreadcrumVO(Application.ROOT, filePath));
-        return "markdown";
+        HtmlRenderer renderer = HtmlRenderer.builder(OPTIONS).build();
+        return renderer.render(document);
     }
 
     private String getCurrentDirectoryPath(HttpServletRequest req) {

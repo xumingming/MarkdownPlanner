@@ -18,7 +18,6 @@ public class Application extends SpringBootServletInitializer {
   }
 
   public static void main(String[] args) {
-    System.out.println("IMAGE_DIR:" + IMAGE_DIR);
     SpringApplication.run(Application.class, args);
   }
 }
