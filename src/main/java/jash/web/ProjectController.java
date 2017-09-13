@@ -45,6 +45,15 @@ public class ProjectController {
                     f.isDirectory()
                 )
             )
+            .sorted((x, y) -> {
+                if (x.isDir() && !y.isDir()) {
+                    return -1;
+                } else if (!x.isDir() && y.isDir()){
+                    return 1;
+                } else {
+                    return x.getName().compareTo(y.getName());
+                }
+            })
             .collect(Collectors.toList());
 
         model.addAttribute("files", fileVOs);

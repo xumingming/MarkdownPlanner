@@ -54,21 +54,19 @@
             </div><!-- /.container-fluid -->
         </nav>
     </div>
-    <ul class="list-group" th:each="file : ${files}" style="margin-bottom:0px">
+    <ul class="list-group" th:each="file : ${files}">
         <li class="list-group-item">
-            <div th:if="${file.isDir()}">
-                <i class="glyphicon glyphicon-folder-close"></i>
-                <a th:text="${file.name}"
-                   th:attr='href=${file.url},alt=${file.url}'>
-                </a>
-            </div>
+            <i th:if="${file.isDir()}" class="glyphicon glyphicon-folder-close"></i>
+            <a th:if="${file.isDir()}"
+               th:text="${file.name}"
+               th:attr='href=${file.url},alt=${file.url}'>
+            </a>
 
-            <div th:unless="${file.isDir()}">
-                <i class="glyphicon glyphicon-file"></i>
-                <a th:text="${file.name}"
-                   th:attr='href=${file.url},alt=${file.url}'>
-                </a>
-            </div>
+            <i th:unless="${file.isDir()}" class="glyphicon glyphicon-file"></i>
+            <a th:text="${file.name}"
+               th:unless="${file.isDir()}"
+               th:attr='href=${file.url},alt=${file.url}'>
+            </a>
         </li>
     </ul>
 </div>
