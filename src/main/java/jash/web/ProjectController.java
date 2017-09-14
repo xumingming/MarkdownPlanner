@@ -19,9 +19,10 @@ import jash.Application;
 import jash.parser.Parser;
 import jash.parser.Project;
 import jash.parser.ProjectStat.PercentageStat;
+import jash.service.PlanService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,9 @@ import static jash.Utils.getFileDisplayName;
 
 @Controller
 public class ProjectController {
+    @Autowired
+    private PlanService planService;
+
     @RequestMapping(value = "/d/**/")
     public String directory(HttpServletRequest req, Model model) throws Exception {
         String filePath = getCurrentDirectoryPath(req);
@@ -84,47 +88,18 @@ public class ProjectController {
         @RequestParam(required = false) String man,
         Model model) throws Exception {
         String filePath = getCurrentFilePath(req);
-        try (FileInputStream stream = new FileInputStream(filePath)) {
-            List<String> lines = IOUtils.readLines(stream, "UTF-8");
-            Parser parser = new Parser();
-            Project fullProject = parser.parse(lines);
-            model.addAttribute("fullProject", fullProject);
+        Project project = planService.getProject(filePath, man, status);
+        model.addAttribute("path",
+            req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
 
-            Project project = filterProject(fullProject, man, status);
-
-            model.addAttribute("path",
-                req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
-            model.addAttribute("project", project);
-            model.addAttribute("selectedMan", man);
-            model.addAttribute("selectedStatus", status);
-            model.addAttribute("breadcrumb", new BreadcrumVO(Application.ROOT, filePath));
-            model.addAttribute("article", renderMarkdown(filePath));
-        }
+        model.addAttribute("fullProject", planService.getProject(filePath));
+        model.addAttribute("project", project);
+        model.addAttribute("selectedMan", man);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("breadcrumb", new BreadcrumVO(Application.ROOT, filePath));
+        model.addAttribute("article", renderMarkdown(filePath));
 
         return "project";
-    }
-
-    private Project filterProject(Project fullProject, @RequestParam(required = false) String man,
-        @RequestParam(required = false) String status) {
-        Project project = fullProject;
-        if (status != null) {
-            switch (status) {
-                case "Completed":
-                    project = project.hideNotCompleted();
-                    break;
-                case "NotCompleted":
-                    project = project.hideCompleted();
-                    break;
-                case "All":
-                default:
-                    break;
-            }
-        }
-
-        if (StringUtils.isNotBlank(man)) {
-            project = project.onlyShowTaskForUser(man);
-        }
-        return project;
     }
 
     @RequestMapping(path = {"/**/*.md"}, produces = "text/html")

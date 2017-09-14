@@ -17,7 +17,6 @@ import lombok.ToString;
  *
  */
 @Getter
-@ToString
 @EqualsAndHashCode(exclude = {"stat"})
 public class Project {
     private LocalDate projectStartDate;
@@ -162,5 +161,10 @@ public class Project {
 
     public UserStat getTotalStat() {
         return stat.getTotalStat();
+    }
+
+    @Override
+    public String toString() {
+        return "Project[" + projectStartDate + ", taskCount: " + tasks.size() + "]";
     }
 }
