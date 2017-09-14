@@ -62,10 +62,13 @@ public class Parser {
     return null;
   }
 
-  public static String parseHeader(String str) {
+  public static LeveledHeader parseHeader(String str) {
     Matcher matcher = HEADER_PATTERN.matcher(str);
     if (matcher.matches()) {
-      return matcher.group(2).trim();
+      int level = matcher.group(1).trim().length();
+      String header = matcher.group(2).trim();
+
+      return new LeveledHeader(level, header);
     }
 
     return null;
@@ -105,9 +108,11 @@ public class Parser {
     List<Vacation> vacations = new ArrayList<>();
     LocalDate projectStartDate = null;
 
+    Header header = Header.create();
     for (String line : lines) {
       Task task = parseTaskLine(line);
       if (task != null) {
+        task.setHeader(header);
         tasks.add(task);
         continue;
       }
@@ -121,6 +126,12 @@ public class Parser {
       LocalDate date = parseProjectStartDate(line);
       if (date != null) {
         projectStartDate = date;
+        continue;
+      }
+
+      LeveledHeader leveledHeader = parseHeader(line);
+      if (leveledHeader != null) {
+        header = header.addLeveledHeader(leveledHeader);
         continue;
       }
     }

@@ -8,6 +8,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 
 import com.google.common.collect.Lists;
+import jash.parser.Header;
+import jash.parser.LeveledHeader;
 import jash.parser.Parser;
 import jash.parser.Project;
 import jash.parser.Task;
@@ -57,19 +59,15 @@ public class ParserTest {
   }
 
   @Test
-  public void testParseHeader_2Sharp() throws Exception {
-    String str = "## hello world ";
+  public void testParseHeader() throws Exception {
+    String str = "# hello world ";
     assertEquals(
-        "hello world",
+        new LeveledHeader(1, "hello world"),
         parser.parseHeader(str)
     );
-  }
-
-  @Test
-  public void testParseHeader_3Sharp() throws Exception {
-    String str = "### hello world ";
+    str = "## hello world ";
     assertEquals(
-        "hello world",
+        new LeveledHeader(2, "hello world"),
         parser.parseHeader(str)
     );
   }
@@ -104,8 +102,11 @@ public class ParserTest {
         + "* james -- 2017-09-18 - 2017-09-18\n"
         + "# 任务细分\n"
         + "* task1 -- 2.5[james][50%]\n"
+        + "## A\n"
         + "* task2 -- 2.5[bond]\n"
+        + "### B\n"
         + "* task3 -- 1[james]\n"
+        + "# C\n"
         + "* task4 -- 1[bond]";
 
     Parser parser = new Parser();
@@ -115,10 +116,10 @@ public class ParserTest {
     Project expectedProject = new Project(
         LocalDate.of(2017, 9, 11),
         Lists.newArrayList(
-            new Task(expectedProjectStartDate, "task1", "james", 5, 50, 0, 18),
-            new Task(expectedProjectStartDate, "task2", "bond", 5, 0, 0, 4),
-            new Task(expectedProjectStartDate, "task3", "james", 2, 0, 19, 20),
-            new Task(expectedProjectStartDate, "task4", "bond", 2, 0, 5, 6)
+            new Task(Header.create("任务细分"), expectedProjectStartDate, "task1", "james", 5, 50, 0, 18),
+            new Task(Header.create("任务细分", "A"), expectedProjectStartDate, "task2", "bond", 5, 0, 0, 4),
+            new Task(Header.create("任务细分", "A", "B"), expectedProjectStartDate, "task3", "james", 2, 0, 19, 20),
+            new Task(Header.create("C"), expectedProjectStartDate, "task4", "bond", 2, 0, 5, 6)
         ),
         Lists.newArrayList(
             new Vacation(

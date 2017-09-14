@@ -16,6 +16,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Task {
+    /** 任务说属于的类别 */
+    private Header header;
     private LocalDate projectStartDate;
     /** task name */
     private String name;
@@ -30,10 +32,18 @@ public class Task {
     private int endOffset;
 
     public Task(String name, String owner, int cost, int progress) {
+        this(null, name, owner, cost, progress, 0, 0);
+    }
+
+    public Task(LocalDate projectStartDate, String name, String owner, int cost, int progress,
+        int startOffset, int endOffset) {
+        this.projectStartDate = projectStartDate;
         this.name = name;
         this.owner = owner;
         this.cost = cost;
         this.progress = progress;
+        this.startOffset = startOffset;
+        this.endOffset = endOffset;
     }
 
     public double getFinishedCost() {
@@ -54,5 +64,9 @@ public class Task {
 
     public boolean isCompleted() {
         return progress == 100;
+    }
+
+    public String getName() {
+        return header.getDisplay() + " :: " + this.name;
     }
 }
