@@ -26,14 +26,13 @@ public class Header {
 
     public Header addLeveledHeader(LeveledHeader leveledHeader) {
         List<LeveledHeader> newHeaders = new ArrayList<>();
-        int index = 0;
-        for (int i = 0; i < headers.size(); i++) {
-            if (headers.get(i).getLevel() == leveledHeader.getLevel()) {
-                index = i;
+        int i = 0;
+        for (; i < headers.size(); i++) {
+            if (headers.get(i).getLevel() >= leveledHeader.getLevel()) {
                 break;
             }
         }
-        newHeaders.addAll(headers.subList(0, index));
+        newHeaders.addAll(headers.subList(0, i));
         newHeaders.add(leveledHeader);
         return new Header(newHeaders);
     }
