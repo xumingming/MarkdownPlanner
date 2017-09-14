@@ -60,12 +60,12 @@ public class ParserTest {
 
   @Test
   public void testParseHeader() throws Exception {
-    String str = "# hello world ";
+    String str = "## hello world ";
     assertEquals(
         new LeveledHeader(1, "hello world"),
         parser.parseHeader(str)
     );
-    str = "## hello world ";
+    str = "### hello world ";
     assertEquals(
         new LeveledHeader(2, "hello world"),
         parser.parseHeader(str)
@@ -106,7 +106,7 @@ public class ParserTest {
         + "* task2 -- 2.5[bond]\n"
         + "### B\n"
         + "* task3 -- 1[james]\n"
-        + "# C\n"
+        + "## C\n"
         + "* task4 -- 1[bond]";
 
     Parser parser = new Parser();

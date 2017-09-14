@@ -67,6 +67,10 @@ public class Task {
     }
 
     public String getName() {
-        return header.getDisplay() + " :: " + this.name;
+        if (header == null || header.getHeaders() == null || header.getHeaders().isEmpty()) {
+            return this.name;
+        } else {
+            return header.getDisplay() + " :: " + this.name;
+        }
     }
 }

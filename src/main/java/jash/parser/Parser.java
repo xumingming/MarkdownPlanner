@@ -65,7 +65,7 @@ public class Parser {
   public static LeveledHeader parseHeader(String str) {
     Matcher matcher = HEADER_PATTERN.matcher(str);
     if (matcher.matches()) {
-      int level = matcher.group(1).trim().length();
+      int level = matcher.group(1).trim().length() - 1;
       String header = matcher.group(2).trim();
 
       return new LeveledHeader(level, header);
