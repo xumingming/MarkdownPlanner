@@ -73,13 +73,8 @@ public class ProjectController {
     PercentageStat projectJson(HttpServletRequest req) throws Exception {
         String filePath = getCurrentFilePath(req);
         filePath = filePath.substring(0, filePath.length() - 5);
-
-        try (FileInputStream stream = new FileInputStream(filePath)) {
-            List<String> lines = IOUtils.readLines(stream, "UTF-8");
-            Parser parser = new Parser();
-            Project fullProject = parser.parse(lines);
-            return fullProject.getStat().getNotFinishedStat();
-        }
+        Project project = planService.getProject(filePath);
+        return project.getStat().getNotFinishedStat();
     }
 
     @RequestMapping(value = "/**/*.plan.md")
