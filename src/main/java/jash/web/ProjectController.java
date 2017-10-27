@@ -34,7 +34,7 @@ public class ProjectController {
     @Autowired
     private PlanService planService;
 
-    @RequestMapping(value = "/d/**/")
+    @RequestMapping(value = "/**/_")
     public String directory(HttpServletRequest req, Model model) throws Exception {
         String filePath = getCurrentDirectoryPath(req);
         List<FileVO> fileVOs = Arrays
@@ -55,7 +55,7 @@ public class ProjectController {
                 } else if (!x.isDir() && y.isDir()){
                     return 1;
                 } else {
-                    return x.getName().compareTo(y.getName());
+                    return y.getName().compareTo(x.getName());
                 }
             })
             .collect(Collectors.toList());
@@ -125,7 +125,7 @@ public class ProjectController {
 
     private String getCurrentDirectoryPath(HttpServletRequest req) {
         String path = (String)req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        return Application.ROOT + path.substring(2);
+        return Application.ROOT + path.substring(0, path.length() - 2);
     }
 
     private String getCurrentFilePath(HttpServletRequest req) {
