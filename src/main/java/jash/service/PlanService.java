@@ -1,5 +1,7 @@
 package jash.service;
 
+import java.util.List;
+
 import jash.parser.Project;
 
 public interface PlanService {
@@ -17,5 +19,5 @@ public interface PlanService {
      * @param status
      * @return
      */
-    Project getProject(String filePath, String man, String status, String keyword, boolean reverse);
+    Project getProject(String filePath, String man, String status, List<String> keywords, boolean reverse);
 }

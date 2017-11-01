@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import jash.parser.ProjectStat.UserStat;
 import lombok.EqualsAndHashCode;
@@ -158,6 +159,15 @@ public class Project {
 
     public Project filterKeyword(String keyword) {
         return filterKeyword(keyword, false);
+    }
+
+    public Project filterKeywords(List<String> keywords, boolean reverse) {
+        Project ret = this;
+        for (String keyword : keywords) {
+            ret = ret.filterKeyword(keyword, reverse);
+        }
+
+        return ret;
     }
 
     public Project filterKeyword(String keyword, boolean reverse) {

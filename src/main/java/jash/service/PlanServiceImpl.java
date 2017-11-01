@@ -22,7 +22,7 @@ public class PlanServiceImpl implements PlanService {
         return getProject(filePath, null, null, null, false);
     }
 
-    public Project getProject(String filePath, String man, String status, String keyword, boolean reverse) {
+    public Project getProject(String filePath, String man, String status, List<String> keywords, boolean reverse) {
         File file = new File(filePath);
         // get from cache
         Project fullProject = projectCacheService.get(filePath);
@@ -43,11 +43,11 @@ public class PlanServiceImpl implements PlanService {
             }
         }
 
-        return filterProject(fullProject, man, status, keyword, reverse);
+        return filterProject(fullProject, man, status, keywords, reverse);
     }
 
     private Project filterProject(Project fullProject, String man,
-        String status, String keyword, boolean reverse) {
+        String status, List<String> keywords, boolean reverse) {
         Project project = fullProject;
         if (status != null) {
             switch (status) {
@@ -67,8 +67,8 @@ public class PlanServiceImpl implements PlanService {
             project = project.onlyShowTaskForUser(man);
         }
 
-        if (StringUtils.isNotBlank(keyword)) {
-            project = project.filterKeyword(keyword, reverse);
+        if (keywords != null && !keywords.isEmpty()) {
+            project = project.filterKeywords(keywords, reverse);
         }
         return project;
     }

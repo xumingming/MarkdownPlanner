@@ -82,7 +82,10 @@ public class ProjectController {
         @RequestParam(required = false, defaultValue = "false") boolean reverse,
         Model model) throws Exception {
         String filePath = getCurrentFilePath(req);
-        Project project = planService.getProject(filePath, man, status, keyword, reverse);
+        String[] keywords = keyword.split("\\|");
+        List<String> cleanedKeywords = Arrays.asList(keywords).stream()
+            .map(x -> x.trim()).collect(Collectors.toList());
+        Project project = planService.getProject(filePath, man, status, cleanedKeywords, reverse);
         model.addAttribute("path",
             req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
 
