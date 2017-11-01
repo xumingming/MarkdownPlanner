@@ -19,10 +19,10 @@ public class PlanServiceImpl implements PlanService {
     @Autowired
     private CacheService<Project> projectCacheService;
     public Project getProject(String filePath) {
-        return getProject(filePath, null, null);
+        return getProject(filePath, null, null, null, false);
     }
 
-    public Project getProject(String filePath, String man, String status) {
+    public Project getProject(String filePath, String man, String status, String keyword, boolean reverse) {
         File file = new File(filePath);
         // get from cache
         Project fullProject = projectCacheService.get(filePath);
@@ -43,11 +43,11 @@ public class PlanServiceImpl implements PlanService {
             }
         }
 
-        return filterProject(fullProject, man, status);
+        return filterProject(fullProject, man, status, keyword, reverse);
     }
 
     private Project filterProject(Project fullProject, String man,
-        String status) {
+        String status, String keyword, boolean reverse) {
         Project project = fullProject;
         if (status != null) {
             switch (status) {
@@ -65,6 +65,10 @@ public class PlanServiceImpl implements PlanService {
 
         if (StringUtils.isNotBlank(man)) {
             project = project.onlyShowTaskForUser(man);
+        }
+
+        if (StringUtils.isNotBlank(keyword)) {
+            project = project.filterKeyword(keyword, reverse);
         }
         return project;
     }

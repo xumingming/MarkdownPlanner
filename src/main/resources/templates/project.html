@@ -101,6 +101,11 @@
 
                     </select>
                 </div>
+                <div class="filter-container" style="float:left; margin-right: 5px">
+                    关键词过滤:
+                    <input id="filterByKeyword" name="keyword" th:value="${selectedKeyword}" />
+                    不包含指定的关键词: <input type="checkbox" name="reverse" th:checked="${selectedReverse}" />
+                </div>
                 <div>
                     <input type="submit" value="GO" />
                 </div>

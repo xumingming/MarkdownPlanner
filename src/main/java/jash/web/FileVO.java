@@ -9,6 +9,6 @@ public class FileVO {
     private boolean isDir;
 
     public String getUrl() {
-        return isDir ? "/d" + url : url;
+        return isDir ? url + "/_" : url;
     }
 }

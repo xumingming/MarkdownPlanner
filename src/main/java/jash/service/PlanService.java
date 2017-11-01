@@ -17,5 +17,5 @@ public interface PlanService {
      * @param status
      * @return
      */
-    Project getProject(String filePath, String man, String status);
+    Project getProject(String filePath, String man, String status, String keyword, boolean reverse);
 }

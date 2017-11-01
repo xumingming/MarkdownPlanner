@@ -156,6 +156,26 @@ public class Project {
         );
     }
 
+    public Project filterKeyword(String keyword) {
+        return filterKeyword(keyword, false);
+    }
+
+    public Project filterKeyword(String keyword, boolean reverse) {
+        return new Project(
+            projectStartDate,
+            this.tasks.stream()
+                .filter(x -> {
+                    boolean tmp = x.getName().toLowerCase().contains(keyword.toLowerCase());
+                    if (reverse) {
+                        return !tmp;
+                    } else {
+                        return tmp;
+                    }
+                })
+                .collect(Collectors.toList()),
+            vacations
+        );
+    }
     public UserStat getUserStat(String user) {
         return stat.getUserStat(user);
     }

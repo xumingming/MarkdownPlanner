@@ -78,9 +78,11 @@ public class ProjectController {
     public String project(HttpServletRequest req,
         @RequestParam(required = false) String status,
         @RequestParam(required = false) String man,
+        @RequestParam(required = false) String keyword,
+        @RequestParam(required = false, defaultValue = "false") boolean reverse,
         Model model) throws Exception {
         String filePath = getCurrentFilePath(req);
-        Project project = planService.getProject(filePath, man, status);
+        Project project = planService.getProject(filePath, man, status, keyword, reverse);
         model.addAttribute("path",
             req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
 
@@ -88,6 +90,8 @@ public class ProjectController {
         model.addAttribute("project", project);
         model.addAttribute("selectedMan", man);
         model.addAttribute("selectedStatus", status);
+        model.addAttribute("selectedKeyword", keyword);
+        model.addAttribute("selectedReverse", reverse);
         model.addAttribute("breadcrumb", new BreadcrumVO(Application.ROOT, filePath));
         model.addAttribute("article", renderMarkdown(filePath));
 
