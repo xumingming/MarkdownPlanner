@@ -162,12 +162,27 @@ public class Project {
     }
 
     public Project filterKeywords(List<String> keywords, boolean reverse) {
-        Project ret = this;
-        for (String keyword : keywords) {
-            ret = ret.filterKeyword(keyword, reverse);
-        }
+        return new Project(
+            projectStartDate,
+            this.tasks.stream()
+                .filter(x -> {
+                    boolean tmp = true;
+                    for (String keyword : keywords) {
+                        tmp = x.getName().toLowerCase().contains(keyword.toLowerCase());
+                        if (tmp) {
+                            break;
+                        }
+                    }
 
-        return ret;
+                    if (reverse) {
+                        return !tmp;
+                    } else {
+                        return tmp;
+                    }
+                })
+                .collect(Collectors.toList()),
+            vacations
+        );
     }
 
     public Project filterKeyword(String keyword, boolean reverse) {
