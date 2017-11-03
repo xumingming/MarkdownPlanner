@@ -130,6 +130,9 @@
             <div class="tab-content">
                 <!-- summary tab -->
                 <div class="tab-pane active" id="summary" role="tabpanel">
+                    <h3>项目<span th:text="${project.projectStartDate}"/>开始，
+                        <span th:text="${project.projectEndDate}"/>结束
+                    </h3>
                     <table id="summary-table" class="table table-bordered">
                         <thead>
                         <tr>
@@ -215,6 +218,15 @@
                                     </div>
                                 </div>
                             </div>
+                        </tr>
+                        <!-- 总状态 -->
+                        <tr th:with="stat=${project.getTotalStat()}">
+                            <td>-</td>
+                            <td th:text="${stat.totalCost / 2}"></td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
                         </tr>
                         </tbody>
                     </table>

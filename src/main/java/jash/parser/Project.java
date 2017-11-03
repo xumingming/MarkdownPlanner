@@ -3,6 +3,7 @@ package jash.parser;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -207,5 +208,13 @@ public class Project {
 
     public UserStat getTotalStat() {
         return stat.getTotalStat();
+    }
+
+    public LocalDate getProjectEndDate() {
+        return this.tasks.stream()
+            .map(Task::getEndDate)
+            .max(Comparator.comparing(JashDate::getDate))
+            .get()
+            .getDate();
     }
 }

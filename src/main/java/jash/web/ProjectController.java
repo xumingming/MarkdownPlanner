@@ -2,6 +2,7 @@ package jash.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import jash.parser.Project;
 import jash.parser.ProjectStat.PercentageStat;
 import jash.service.PlanService;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.HandlerMapping;
 
+import static jash.Utils.getCurrentDirectoryPath;
+import static jash.Utils.getCurrentFilePath;
 import static jash.Utils.getFileDisplayName;
 
 @Controller
@@ -82,9 +86,12 @@ public class ProjectController {
         @RequestParam(required = false, defaultValue = "false") boolean reverse,
         Model model) throws Exception {
         String filePath = getCurrentFilePath(req);
-        String[] keywords = keyword.split("\\|");
-        List<String> cleanedKeywords = Arrays.asList(keywords).stream()
-            .map(x -> x.trim()).collect(Collectors.toList());
+        List<String> cleanedKeywords = new ArrayList<>();
+        if (StringUtils.isNotBlank(keyword)) {
+            String[] keywords = keyword.split("\\|");
+            cleanedKeywords = Arrays.asList(keywords).stream()
+                .map(x -> x.trim()).collect(Collectors.toList());
+        }
         Project project = planService.getProject(filePath, man, status, cleanedKeywords, reverse);
         model.addAttribute("path",
             req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
@@ -128,15 +135,5 @@ public class ProjectController {
         );
         HtmlRenderer renderer = HtmlRenderer.builder(OPTIONS).build();
         return renderer.render(document);
-    }
-
-    private String getCurrentDirectoryPath(HttpServletRequest req) {
-        String path = (String)req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        return Application.ROOT + path.substring(0, path.length() - 2);
-    }
-
-    private String getCurrentFilePath(HttpServletRequest req) {
-        String path = (String)req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        return Application.ROOT + path;
     }
 }
