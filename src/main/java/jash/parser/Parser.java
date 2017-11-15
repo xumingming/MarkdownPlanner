@@ -110,6 +110,7 @@ public class Parser {
 
     Header header = Header.create();
     for (String line : lines) {
+      line = line.trim();
       Task task = parseTaskLine(line);
       if (task != null) {
         task.setHeader(header);
