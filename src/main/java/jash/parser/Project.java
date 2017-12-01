@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -211,10 +212,10 @@ public class Project {
     }
 
     public LocalDate getProjectEndDate() {
-        return this.tasks.stream()
+        Optional<JashDate> ret = this.tasks.stream()
             .map(Task::getEndDate)
-            .max(Comparator.comparing(JashDate::getDate))
-            .get()
-            .getDate();
+            .max(Comparator.comparing(JashDate::getDate));
+
+        return ret.isPresent() ? ret.get().getDate() : null;
     }
 }
