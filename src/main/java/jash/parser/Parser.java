@@ -20,7 +20,7 @@ public class Parser {
       Pattern.compile(".*?ProjectStartDate:\\s*([0-9]{4}-[0-9]{2}-[0-9]{2})");
 
   private static final Pattern HEADER_PATTERN =
-      Pattern.compile("^(#{2,})(.*)");
+      Pattern.compile("^(#{1,})(.*)");
 
   private static final Pattern VACATION_PATTERN =
       Pattern.compile("^\\*(.+?)--\\s*([0-9]{4}-[0-9]{2}-[0-9]{2})(\\s*-\\s*([0-9]{4}-[0-9]{2}-[0-9]{2}))?\\s*$");
@@ -107,6 +107,7 @@ public class Parser {
     List<Task> tasks = new ArrayList<>();
     List<Vacation> vacations = new ArrayList<>();
     LocalDate projectStartDate = null;
+    String name = null;
 
     Header header = Header.create();
     for (String line : lines) {
@@ -132,11 +133,15 @@ public class Parser {
 
       LeveledHeader leveledHeader = parseHeader(line);
       if (leveledHeader != null) {
-        header = header.addLeveledHeader(leveledHeader);
+        if (name == null) {
+          name = leveledHeader.getDisplay();
+        } else {
+          header = header.addLeveledHeader(leveledHeader);
+        }
         continue;
       }
     }
 
-    return new Project(projectStartDate, tasks, vacations);
+    return new Project(name, projectStartDate, tasks, vacations);
   }
 }

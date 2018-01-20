@@ -21,16 +21,16 @@ public class ProjectCacheServiceImpl implements CacheService<Project> {
         CacheItem<Project> cachedProject = projectCache.get(key);
         if (cachedProject != null) {
             if (LOG.isInfoEnabled()) {
-                LOG.info("Found project from cache: " + cachedProject);
+                LOG.info("Found project from cache: " + cachedProject.getItem().getName());
             }
 
             if (cachedProject.getLastModified() == getLastModified(key)) {
                 if (LOG.isInfoEnabled()) {
-                    LOG.info("Project " + cachedProject.getItem() + " is not modified since last retrieve");
+                    LOG.info("Project " + cachedProject.getItem().getName() + " is not modified since last retrieve");
                 }
                 return cachedProject.getItem();
             } else {
-                LOG.info("Project " + cachedProject.getItem() + " IS MODIFIED({} vs {}) since last retrieve",
+                LOG.info("Project " + cachedProject.getItem().getName() + " IS MODIFIED({} vs {}) since last retrieve",
                     Instant.ofEpochMilli(cachedProject.getLastModified()).atZone(ZoneId.systemDefault()),
                     Instant.ofEpochMilli(getLastModified(key)).atZone(ZoneId.systemDefault())
                 );

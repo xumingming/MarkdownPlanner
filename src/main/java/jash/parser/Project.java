@@ -23,13 +23,19 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode(exclude = {"stat"})
 public class Project {
+    /** 名字 */
+    private String name;
+    /** 项目开始时间 */
     private LocalDate projectStartDate;
+    /** 所有任务 */
     private List<Task> tasks;
+    /** 所有的请假安排 */
     private List<Vacation> vacations;
+    /** 项目统计信息 */
     private ProjectStat stat;
 
-
-    public Project(LocalDate projectStartDate, List<Task> tasks, List<Vacation> vacations) {
+    public Project(String name, LocalDate projectStartDate, List<Task> tasks, List<Vacation> vacations) {
+        this.name = name;
         this.projectStartDate = projectStartDate;
         this.tasks = tasks;
         this.vacations = vacations;
@@ -137,6 +143,7 @@ public class Project {
 
     public Project hideCompleted() {
         return new Project(
+            name,
             projectStartDate,
             this.tasks.stream().filter(x -> !x.isCompleted()).collect(Collectors.toList()),
             vacations
@@ -145,6 +152,7 @@ public class Project {
 
     public Project hideNotCompleted() {
         return new Project(
+            name,
             projectStartDate,
             this.tasks.stream().filter(x -> x.isCompleted()).collect(Collectors.toList()),
             vacations
@@ -153,6 +161,7 @@ public class Project {
 
     public Project onlyShowTaskForUser(String user) {
         return new Project(
+            name,
             projectStartDate,
             this.tasks.stream().filter(x -> x.getOwner().equals(user)).collect(Collectors.toList()),
             vacations
@@ -165,6 +174,7 @@ public class Project {
 
     public Project filterKeywords(List<String> keywords, boolean reverse) {
         return new Project(
+            name,
             projectStartDate,
             this.tasks.stream()
                 .filter(x -> {
@@ -189,6 +199,7 @@ public class Project {
 
     public Project filterKeyword(String keyword, boolean reverse) {
         return new Project(
+            name,
             projectStartDate,
             this.tasks.stream()
                 .filter(x -> {
