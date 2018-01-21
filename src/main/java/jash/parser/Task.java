@@ -2,7 +2,6 @@ package jash.parser;
 
 import java.time.LocalDate;
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,9 +12,8 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode
 @ToString
-@AllArgsConstructor
 @NoArgsConstructor
-public class Task {
+public class Task implements ITask {
     protected int id;
     protected int parentId;
     /** 任务说属于的类别 */
@@ -77,10 +75,6 @@ public class Task {
 
     public boolean isCompleted() {
         return progress == 100;
-    }
-
-    public String getName() {
-        return this.name;
     }
 
     public boolean isComposite() {
