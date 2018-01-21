@@ -19,7 +19,7 @@ public class Header {
     public static Header create(String... headers) {
         List<LeveledHeader> headerObjs = new ArrayList<>(headers.length);
         for (int i = 0; i < headers.length; i++) {
-            headerObjs.add(new LeveledHeader(i + 1, headers[i]));
+            headerObjs.add(new LeveledHeader(i, headers[i]));
         }
         return new Header(headerObjs);
     }
