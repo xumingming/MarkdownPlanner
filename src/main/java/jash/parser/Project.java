@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -15,6 +16,7 @@ import jash.parser.ProjectStat.UserStat;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -42,8 +44,17 @@ public class Project {
         init();
     }
 
+    public Project(LocalDate projectStartDate, List<Task> tasks, List<Vacation> vacations) {
+        this(null, projectStartDate, tasks, vacations);
+    }
+
     public List<String> getMen() {
-        return tasks.stream().map(Task::getOwner).distinct().collect(Collectors.toList());
+        return tasks.stream()
+            .filter(task -> !task.isComposite())
+            .map(Task::getOwner)
+            .filter(StringUtils::isNotBlank)
+            .distinct()
+            .collect(Collectors.toList());
     }
 
     public double getProgress() {
@@ -76,7 +87,7 @@ public class Project {
     private void init() {
         Map<String, List<Task>> user2Tasks = new HashMap<>();
         Map<String, UserStat> userStats = new HashMap<>();
-        this.tasks.forEach(task -> {
+        this.tasks.stream().filter(task -> !task.isComposite()).forEach(task -> {
             task.setProjectStartDate(projectStartDate);
 
             String user = task.getOwner();
@@ -95,19 +106,43 @@ public class Project {
             user2Tasks.get(user).add(task);
         });
 
+
         stat = new ProjectStat(userStats);
 
-        user2Tasks.keySet().stream().forEach(user -> {
+        user2Tasks.keySet().stream()
+            .forEach(user -> {
             List<Task> tasks = user2Tasks.get(user);
             int lastOffset = 0;
             for(Task task : tasks) {
-                int newOffset = calculateEndOffset(lastOffset, task.getCost(), task.getOwner());
-                task.setStartOffset(lastOffset);
-                task.setEndOffset(newOffset);
+                if (!task.isComposite()) {
+                    int newOffset = calculateEndOffset(lastOffset, task.getCost(), task.getOwner());
+                    task.setStartOffset(lastOffset);
+                    task.setEndOffset(newOffset);
 
-                lastOffset = newOffset + 1;
+                    lastOffset = newOffset + 1;
+                }
             }
         });
+
+        // 初始化所有组合任务
+        List<Task> notInitedTasks = tasks.stream().filter(t1 -> t1.getEndOffset() <= 0).collect(Collectors.toList());
+        int initCount = 0;
+        while (!notInitedTasks.isEmpty() && initCount < 5) {
+            for (Task task : notInitedTasks) {
+                int taskId = task.getId();
+                Optional<Integer> startOffset = tasks.stream().filter(t -> t.getParentId() == taskId)
+                    .map(Task::getStartOffset)
+                    .min(Comparator.comparingInt(x -> x));
+                Optional<Integer> endOffset = tasks.stream().filter(t -> t.getParentId() == taskId)
+                    .map(Task::getEndOffset)
+                    .max(Comparator.comparingInt(x -> x));
+                task.setStartOffset(startOffset.isPresent() ? startOffset.get() : 0);
+                task.setEndOffset(endOffset.isPresent() ? endOffset.get() : 0);
+            }
+
+            notInitedTasks = tasks.stream().filter(t1 -> t1.getEndOffset() <= 0).collect(Collectors.toList());
+            initCount++;
+        }
     }
 
     public int calculateEndOffset(int lastOffset, int numOfHalfDays, String owner) {

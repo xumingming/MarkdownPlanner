@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import com.vladsch.flexmark.util.options.MutableDataSet;
 import jash.Application;
 import jash.parser.Project;
 import jash.parser.ProjectStat.PercentageStat;
+import jash.parser.Task;
 import jash.service.PlanService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -96,8 +98,8 @@ public class ProjectController {
         model.addAttribute("path",
             req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
 
-        model.addAttribute("fullProject", planService.getProject(filePath));
-        model.addAttribute("project", project);
+        model.addAttribute("fullProject", Converters.convert(planService.getProject(filePath)));
+        model.addAttribute("project", Converters.convert(project));
         model.addAttribute("selectedMan", man);
         model.addAttribute("selectedStatus", status);
         model.addAttribute("selectedKeyword", keyword);

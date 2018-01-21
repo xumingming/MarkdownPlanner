@@ -29,8 +29,6 @@ public class ProjectStat {
 
     public PercentageStat getNotFinishedStat() {
         List<String> users = userStats.stream().map(UserStat::getUser).collect(Collectors.toList());
-        double unfinishedCost = userStats.stream()
-            .collect(Collectors.summingDouble(UserStat::getNotFinishedManDays));
         List<Double> percentages = userStats.stream()
             .map(ut -> formatDouble(ut.getNotFinishedManDays()))
             .collect(Collectors.toList());

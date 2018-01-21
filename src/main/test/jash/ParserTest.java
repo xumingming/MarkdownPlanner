@@ -95,7 +95,7 @@ public class ParserTest {
 
   @Test
   public void testParse() throws Exception {
-    String content = "# 项目基本信息\n"
+    String content = "# hello\n"
         + "* ProjectStartDate: 2017-09-11\n"
         + "* james -- 2017-09-11 - 2017-09-12\n"
         + "* james -- 2017-09-13 - 2017-09-14\n"
@@ -114,6 +114,7 @@ public class ParserTest {
 
     LocalDate expectedProjectStartDate = LocalDate.of(2017, 9, 11);
     Project expectedProject = new Project(
+        "hello",
         LocalDate.of(2017, 9, 11),
         Lists.newArrayList(
             new Task(Header.create(), expectedProjectStartDate, "task1", "james", 5, 50, 0, 18),

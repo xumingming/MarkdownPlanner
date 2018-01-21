@@ -14,6 +14,7 @@ public class ProjectTest {
     @Test
     public void getMen() throws Exception {
         Project project = new Project(
+            "hello",
             LocalDate.of(2017, 10, 10),
             Lists.newArrayList(
                 new Task("hello", "james", 1, 1),

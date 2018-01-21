@@ -3,39 +3,23 @@
 <head>
     <title>Jash</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <script src="/jquery-2.2.4.js"></script>
-    <script src="/tasks.js"></script>
-    <script src="/stat.js"></script>
     <link rel="stylesheet" href="/markdown.css" />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.js" />
-    <script src="/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/jquery-ui/jquery-ui.min.css" />
     <link rel="stylesheet" href="/bootstrap.min.css" />
     <link rel="stylesheet" href="/bootstrap-theme.min.css" />
 
-    <style>
-	.markdown-body {
-		box-sizing: border-box;
-		min-width: 200px;
-		max-width: 980px;
-		margin: 0 auto;
-		padding: 45px;
-	}
+    <link rel="stylesheet" href="/jquery-treetable/css/jquery.treetable.css" />
+    <link rel="stylesheet" href="/jquery-treetable/css/jquery.treetable.theme.default.css" />
 
-	@media (max-width: 767px) {
-		.markdown-body {
-			padding: 15px;
-		}
-	}
-    </style>
+    <link rel="stylesheet" href="/main.css" />
 </head>
 <body>
     <div class="container">
         <input type="hidden" id="path" th:attr="value=${path}" />
         <div>
             <nav class="navbar navbar-default">
-                <div class="container-fluid">
-                    <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="container">
                     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                         <ol class="breadcrumb" style="float:left;position:relative;top:10px">
                             <li th:each="file : ${breadcrumb.links}">
@@ -185,7 +169,11 @@
                         <span th:text="${stat.progress}"></span>%
                     </div>
 
-                    <table id="my-table" class="table table-bordered">
+                    <table id="example-advanced">
+                        <caption>
+                            <a href="#" onclick="jQuery('#example-advanced').treetable('expandAll'); return false;">Expand all</a>
+                            <a href="#" onclick="jQuery('#example-advanced').treetable('collapseAll'); return false;">Collapse all</a>
+                        </caption>
                         <thead>
                         <tr>
                             <th>任务</th>
@@ -197,37 +185,32 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="task : ${project.tasks}">
-                            <td th:text="${task.name}"></td>
-                            <td th:text="${task.cost / 2.0}"></td>
-                            <td th:text="${task.owner}"></td>
-                            <td th:text="${task.startDate}"></td>
-                            <td th:text="${task.endDate}"></td>
-                            <div th:switch="${task.progress == 100}">
-                                <td th:case="true" class="success">
-                                    ✔
+                            <tr th:each="task : ${project.tasks}" th:attr="data-tt-id=${task.id}, data-tt-parent-id=${task.parentId}">
+                                <td>
+                                    <span th:if="${task.composite}" th:attr='class=folder' th:text="${task.name}"></span>
+                                    <span th:unless="${task.composite}" th:attr='class=file' th:text="${task.name}"></span>
                                 </td>
-                                <div th:case="false" class="info">
-                                    <div th:switch="${task.delayed}">
-                                        <td th:case="true" class="danger">
-                                            <span th:text="${task.progress}"></span>%
-                                        </td>
-                                        <td th:case="false" class="info">
-                                            <span th:text="${task.progress}"></span>%
-                                        </td>
+                                <td th:text="${task.manDays}"></td>
+                                <td th:text="${task.owner}"></td>
+                                <td th:text="${task.startDate}"></td>
+                                <td th:text="${task.endDate}"></td>
+                                <div th:switch="${task.progress == 100}">
+                                    <td th:case="true" class="success">
+                                        <span>✔</span>
+
+                                    </td>
+                                    <div th:case="false" class="info">
+                                        <div th:switch="${task.delayed}">
+                                            <td th:case="true" class="danger">
+                                                <span th:text="${task.progress}"></span>%
+                                            </td>
+                                            <td th:case="false" class="info">
+                                                <span th:text="${task.progress}"></span>%
+                                            </td>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </tr>
-                        <!-- 总状态 -->
-                        <tr th:with="stat=${project.getTotalStat()}">
-                            <td>-</td>
-                            <td th:text="${stat.totalCost / 2}"></td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                        </tr>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -238,5 +221,12 @@
             </div>
         </div>
     </div>
+    <script src="/jquery-2.2.4.js"></script>
+    <script src="/jquery-ui/jquery-ui.min.js"></script>
+    <script src="/jquery-treetable/jquery.treetable.js"></script>
+    <script src="/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.js" />
+    <script src="/tasks.js"></script>
+    <script src="/stat.js"></script>
 </body>
 </html>

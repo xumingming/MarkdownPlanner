@@ -16,20 +16,33 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Task {
+    protected int id;
+    protected int parentId;
     /** 任务说属于的类别 */
-    private Header header;
-    private LocalDate projectStartDate;
+    protected Header header;
+    protected LocalDate projectStartDate;
     /** task name */
-    private String name;
+    protected String name;
     /** task owner */
-    private String owner;
+    protected String owner;
     /** half man days */
-    private int cost;
+    protected int cost;
     /** progress */
-    private int progress;
+    protected int progress;
     /** offset from ProjectStartDate(Unit: HalfDay) */
-    private int startOffset;
-    private int endOffset;
+    protected int startOffset;
+    protected int endOffset;
+
+    public Task(Header header, LocalDate projectStartDate, String name, String owner, int cost, int progress, int startOffset, int endOffset) {
+        this.header = header;
+        this.projectStartDate = projectStartDate;
+        this.name = name;
+        this.owner = owner;
+        this.cost = cost;
+        this.progress = progress;
+        this.startOffset = startOffset;
+        this.endOffset = endOffset;
+    }
 
     public Task(String name, String owner, int cost, int progress) {
         this(null, name, owner, cost, progress, 0, 0);
@@ -47,7 +60,7 @@ public class Task {
     }
 
     public double getFinishedCost() {
-        return progress * cost / 100;
+        return getProgress() * getCost() / 100;
     }
 
     public JashDate getStartDate() {
@@ -67,10 +80,10 @@ public class Task {
     }
 
     public String getName() {
-        if (header == null || header.getHeaders() == null || header.getHeaders().isEmpty()) {
-            return this.name;
-        } else {
-            return header.getDisplay() + " :: " + this.name;
-        }
+        return this.name;
+    }
+
+    public boolean isComposite() {
+        return false;
     }
 }
