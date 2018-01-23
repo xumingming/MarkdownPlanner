@@ -136,7 +136,8 @@
                         </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="task : ${project.tasks}" th:attr="data-tt-id=${task.id}, data-tt-parent-id=${task.parentId}">
+                            <tr th:each="task : ${project.tasks}"
+                                th:attr="data-tt-id=${task.id}, data-tt-parent-id=${task.parentId}, class=${task.bgColorClass}">
                                 <td>
                                     <span th:if="${task.composite}" th:attr='class=folder' th:text="${task.name}"></span>
                                     <span th:unless="${task.composite}" th:attr='class=file' th:text="${task.name}"></span>
@@ -145,22 +146,9 @@
                                 <td th:text="${task.owner}"></td>
                                 <td th:text="${task.startDate}"></td>
                                 <td th:text="${task.endDate}"></td>
-                                <div th:switch="${task.progress == 100}">
-                                    <td th:case="true" class="success">
-                                        <span>✔</span>
-
-                                    </td>
-                                    <div th:case="false" class="info">
-                                        <div th:switch="${task.delayed}">
-                                            <td th:case="true" class="danger">
-                                                <span th:text="${task.progress}"></span>%
-                                            </td>
-                                            <td th:case="false" class="info">
-                                                <span th:text="${task.progress}"></span>%
-                                            </td>
-                                        </div>
-                                    </div>
-                                </div>
+                                <td>
+                                    <span th:text="${task.progress}"></span>%
+                                </td>
                             </tr>
                         </tbody>
                     </table>

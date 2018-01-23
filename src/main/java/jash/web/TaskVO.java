@@ -22,5 +22,6 @@ public class TaskVO {
     private String endDate;
     /** 进度 */
     private int progress;
-    private boolean isDelayed;
+    /** 显示颜色 */
+    private String bgColorClass;
 }

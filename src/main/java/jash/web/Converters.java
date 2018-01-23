@@ -25,7 +25,21 @@ public class Converters {
         taskVO.setEndDate(task.getEndDate().toString());
         taskVO.setProgress(task.getProgress());
         taskVO.setManDays(String.format("%.1f", task.getCost() / 2.0));
-        taskVO.setDelayed(task.isDelayed());
+        String bgColorClass = "jash-bg-secondary";
+        if (task.isStarted()) {
+            bgColorClass = "jash-bg-primary";
+            if (task.isCompleted()) {
+                bgColorClass = "jash-bg-success";
+            } else if (task.isDelayed()) {
+                bgColorClass = "jash-bg-warning";
+            }
+        } else {
+            if (task.isDelayed()) {
+                bgColorClass = "jash-bg-danger";
+            }
+        }
+
+        taskVO.setBgColorClass(bgColorClass);
         taskVO.setComposite(task.isComposite());
         return taskVO;
     }

@@ -30,3 +30,29 @@
 table {
     font-size: 12px;
 }
+
+#example-advanced .jash-bg-warning {
+    background-color: #fcf8e3
+}
+
+#example-advanced .jash-bg-success {
+    background-color: #dff0d8
+}
+
+#example-advanced .jash-bg-primary {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+#example-advanced .jash-bg-secondary {
+    background-color: #f8f9fa;
+}
+
+#example-advanced .jash-bg-danger {
+    background-color: #f2dede
+}
+
+#example-advanced .selected {
+    background-color: #3875d7;
+    color: #fff;
+}

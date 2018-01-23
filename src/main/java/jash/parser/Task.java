@@ -69,12 +69,15 @@ public class Task implements ITask {
         return new HalfDayDuration(endOffset).addToDate(projectStartDate);
     }
 
+    public boolean isStarted() {
+        return getProgress() > 0;
+    }
     public boolean isDelayed() {
-        return progress < 100 && LocalDate.now().compareTo(getEndDate().getDate()) > 0;
+        return getProgress() < 100 && LocalDate.now().compareTo(getEndDate().getDate()) > 0;
     }
 
     public boolean isCompleted() {
-        return progress == 100;
+        return getProgress() == 100;
     }
 
     public boolean isComposite() {
