@@ -38,7 +38,12 @@ public class ProjectController {
     @Autowired
     private PlanService planService;
 
-    @RequestMapping(value = "/**/_")
+    @RequestMapping(value = "/")
+    public String index(HttpServletRequest req, Model model) throws Exception {
+        return "redirect:/tree";
+    }
+
+    @RequestMapping(value = "/tree/**")
     public String directory(HttpServletRequest req, Model model) throws Exception {
         String filePath = getCurrentDirectoryPath(req);
         List<FileVO> fileVOs = Arrays

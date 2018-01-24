@@ -34,7 +34,7 @@ public class Utils {
 
     public static String getCurrentDirectoryPath(HttpServletRequest req) {
         String path = (String)req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        return Application.ROOT + path.substring(0, path.length() - 2);
+        return Application.ROOT + path.substring(5, path.length());
     }
 
     public static String getCurrentFilePath(HttpServletRequest req) {
