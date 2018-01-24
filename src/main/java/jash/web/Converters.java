@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import jash.parser.CompositeTask;
-import jash.parser.Header;
-import jash.parser.Project;
-import jash.parser.Task;
+import jash.model.task.CompositeTask;
+import jash.model.Header;
+import jash.model.task.Task;
+import jash.model.Project;
 
 public class Converters {
     public static TaskVO convert(Task task) {
@@ -83,7 +83,7 @@ public class Converters {
             Header header = task.getHeader();
             addCompositeTaskIfNeeded(tasks, rootTask, compositeTaskMap, idCounter, header);
 
-            Task parentTask = compositeTaskMap.get(task.getHeader());
+            CompositeTask parentTask = compositeTaskMap.get(task.getHeader());
             task.setId(idCounter.incrementAndGet());
             task.setParentId(parentTask.getId());
             tasks.add(task);
@@ -104,7 +104,7 @@ public class Converters {
         }
     }
 
-    private static void addCompositeTaskIfNeeded(List<Task> tasks, Task rootTask, Map<Header, CompositeTask> compositeTaskMap,
+    private static void addCompositeTaskIfNeeded(List<Task> tasks, CompositeTask rootTask, Map<Header, CompositeTask> compositeTaskMap,
         AtomicInteger idCounter, Header header) {
         for (int i = 0; i < header.getHeaders().size(); i++) {
             Header currentHeader = new Header(header.getHeaders().subList(0, i + 1));

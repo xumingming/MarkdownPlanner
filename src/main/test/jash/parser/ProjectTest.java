@@ -1,18 +1,15 @@
 package jash.parser;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import jash.parser.CompositeTask;
-import jash.parser.Header;
-import jash.parser.Project;
-import jash.parser.Task;
-import jash.parser.Vacation;
+import jash.model.Header;
+import jash.model.Project;
+import jash.model.Vacation;
+import jash.model.task.CompositeTask;
+import jash.model.task.Task;
+import jash.model.task.AtomicTask;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -27,10 +24,10 @@ public class ProjectTest {
             "hello",
             LocalDate.of(2017, 10, 10),
             Lists.newArrayList(
-                new Task("hello", "james", 1, 1),
-                new Task("hello", "bond", 1, 1),
-                new Task("hello", "james", 1, 1),
-                new Task("hello", "lucy", 1, 1)
+                new AtomicTask("hello", "james", 1, 1),
+                new AtomicTask("hello", "bond", 1, 1),
+                new AtomicTask("hello", "james", 1, 1),
+                new AtomicTask("hello", "lucy", 1, 1)
             ),
             Lists.newArrayList()
         );
@@ -121,10 +118,10 @@ public class ProjectTest {
         Project project = new Project(
             LocalDate.of(2017, 9, 11),
             Lists.newArrayList(
-                new Task("task1", "james", 5, 10),
-                new Task("task2", "bond", 5, 100),
-                new Task("task3", "james", 2, 100),
-                new Task("task4", "bond", 2, 100)
+                new AtomicTask("task1", "james", 5, 10),
+                new AtomicTask("task2", "bond", 5, 100),
+                new AtomicTask("task3", "james", 2, 100),
+                new AtomicTask("task4", "bond", 2, 100)
             ),
             Lists.newArrayList(
                 new Vacation(
@@ -263,10 +260,10 @@ public class ProjectTest {
         Project project = new Project(
             LocalDate.of(2017, 9, 11),
             ImmutableList.of(
-                new Task("task1", "james", 5),
-                new Task("task2", "bond", 5),
-                new Task("task3", "james", 2),
-                new Task("task4", "bond", 2)
+                new AtomicTask("task1", "james", 5),
+                new AtomicTask("task2", "bond", 5),
+                new AtomicTask("task3", "james", 2),
+                new AtomicTask("task4", "bond", 2)
             )
         );
 
@@ -280,10 +277,10 @@ public class ProjectTest {
         project = new Project(
             LocalDate.of(2017, 9, 11),
             ImmutableList.of(
-                new Task("task1", "james", 5),
-                new Task("task2", "bond", 5),
-                new Task("task3", "james", 2),
-                new Task("task4", "bond", 2),
+                new AtomicTask("task1", "james", 5),
+                new AtomicTask("task2", "bond", 5),
+                new AtomicTask("task3", "james", 2),
+                new AtomicTask("task4", "bond", 2),
                 compositeTask
             )
         );
@@ -296,10 +293,10 @@ public class ProjectTest {
         Project project = new Project(
             LocalDate.of(2017, 9, 11),
             ImmutableList.of(
-                new Task("task1", "james", 5, 50),
-                new Task("task2", "bond", 5, 50),
-                new Task("task3", "james", 2, 50),
-                new Task("task4", "bond", 2, 50)
+                new AtomicTask("task1", "james", 5, 50),
+                new AtomicTask("task2", "bond", 5, 50),
+                new AtomicTask("task3", "james", 2, 50),
+                new AtomicTask("task4", "bond", 2, 50)
             )
         );
 
@@ -313,10 +310,10 @@ public class ProjectTest {
         project = new Project(
             LocalDate.of(2017, 9, 11),
             ImmutableList.of(
-                new Task("task1", "james", 5, 50),
-                new Task("task2", "bond", 5, 50),
-                new Task("task3", "james", 2, 50),
-                new Task("task4", "bond", 2, 50),
+                new AtomicTask("task1", "james", 5, 50),
+                new AtomicTask("task2", "bond", 5, 50),
+                new AtomicTask("task3", "james", 2, 50),
+                new AtomicTask("task4", "bond", 2, 50),
                 compositeTask
             )
         );

@@ -1,4 +1,4 @@
-package jash.parser;
+package jash.model;
 
 import java.time.LocalDate;
 

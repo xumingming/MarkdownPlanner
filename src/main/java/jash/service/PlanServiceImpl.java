@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.util.List;
 
 import jash.parser.Parser;
-import jash.parser.Project;
+import jash.model.Project;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

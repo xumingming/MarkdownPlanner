@@ -2,8 +2,8 @@ package jash;
 
 import java.time.LocalDate;
 
-import jash.parser.HalfDayDuration;
-import jash.parser.JashDate;
+import jash.model.HalfDayDuration;
+import jash.model.JashDate;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

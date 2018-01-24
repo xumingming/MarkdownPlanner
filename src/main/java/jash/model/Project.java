@@ -1,4 +1,4 @@
-package jash.parser;
+package jash.model;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -8,11 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
-import jash.parser.ProjectStat.UserStat;
+import jash.model.ProjectStat.UserStat;
+import jash.model.task.Task;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

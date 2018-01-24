@@ -8,12 +8,11 @@ import java.time.Duration;
 import java.time.LocalDate;
 
 import com.google.common.collect.Lists;
-import jash.parser.Header;
-import jash.parser.LeveledHeader;
-import jash.parser.Parser;
-import jash.parser.Project;
-import jash.parser.Task;
-import jash.parser.Vacation;
+import jash.model.Header;
+import jash.model.LeveledHeader;
+import jash.model.Project;
+import jash.model.Vacation;
+import jash.model.task.AtomicTask;
 import org.junit.Test;
 
 /**
@@ -28,24 +27,24 @@ public class ParserTest {
   public void testParseTaskLine_withOnlyManDays() {
     String str = "* this is a task -- 0.5";
 
-    Task expectedTask = new Task("this is a task", "TODO", 1, 0);
-    Task actualTask = parser.parseTaskLine(str);
+    AtomicTask expectedTask = new AtomicTask("this is a task", "TODO", 1, 0);
+    AtomicTask actualTask = parser.parseTaskLine(str);
     assertEquals(expectedTask, actualTask);
   }
 
   @Test
   public void testParseTaskLine_withManDaysAndOwner() {
     String str = "* this is a task -- 1[james]";
-    Task expectedTask = new Task("this is a task", "james", 2, 0);
-    Task actualTask = parser.parseTaskLine(str);
+    AtomicTask expectedTask = new AtomicTask("this is a task", "james", 2, 0);
+    AtomicTask actualTask = parser.parseTaskLine(str);
     assertEquals(expectedTask, actualTask);
   }
 
   @Test
   public void testParseTaskLine_full() {
     String str = "* this is a task -- 1[james][10%]";
-    Task expectedTask = new Task("this is a task", "james", 2, 10);
-    Task actualTask = parser.parseTaskLine(str);
+    AtomicTask expectedTask = new AtomicTask("this is a task", "james", 2, 10);
+    AtomicTask actualTask = parser.parseTaskLine(str);
     assertEquals(expectedTask, actualTask);
   }
 
@@ -117,10 +116,10 @@ public class ParserTest {
         "hello",
         LocalDate.of(2017, 9, 11),
         Lists.newArrayList(
-            new Task(Header.create("任务细分"), expectedProjectStartDate, "task1", "james", 5, 50, 0, 18),
-            new Task(Header.create("任务细分", "A"), expectedProjectStartDate, "task2", "bond", 5, 0, 0, 4),
-            new Task(Header.create("任务细分", "A", "B"), expectedProjectStartDate, "task3", "james", 2, 0, 19, 20),
-            new Task(Header.create("任务细分", "C"), expectedProjectStartDate, "task4", "bond", 2, 0, 5, 6)
+            new AtomicTask(Header.create("任务细分"), expectedProjectStartDate, "task1", "james", 5, 50, 0, 18),
+            new AtomicTask(Header.create("任务细分", "A"), expectedProjectStartDate, "task2", "bond", 5, 0, 0, 4),
+            new AtomicTask(Header.create("任务细分", "A", "B"), expectedProjectStartDate, "task3", "james", 2, 0, 19, 20),
+            new AtomicTask(Header.create("任务细分", "C"), expectedProjectStartDate, "task4", "bond", 2, 0, 5, 6)
         ),
         Lists.newArrayList(
             new Vacation(

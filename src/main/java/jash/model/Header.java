@@ -1,4 +1,4 @@
-package jash.parser;
+package jash.model;
 
 import java.util.ArrayList;
 import java.util.Comparator;

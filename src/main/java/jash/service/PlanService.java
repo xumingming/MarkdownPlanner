@@ -2,7 +2,7 @@ package jash.service;
 
 import java.util.List;
 
-import jash.parser.Project;
+import jash.model.Project;
 
 public interface PlanService {
     /**

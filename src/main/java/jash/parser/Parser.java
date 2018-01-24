@@ -9,6 +9,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import jash.model.Header;
+import jash.model.LeveledHeader;
+import jash.model.Project;
+import jash.model.Vacation;
+import jash.model.task.Task;
+import jash.model.task.AtomicTask;
+
 /**
  * Parser of yash files.
  */
@@ -26,7 +33,7 @@ public class Parser {
       Pattern.compile("^\\*(.+?)--\\s*([0-9]{4}-[0-9]{2}-[0-9]{2})(\\s*-\\s*([0-9]{4}-[0-9]{2}-[0-9]{2}))?\\s*$");
 
 
-  public Task parseTaskLine(String line) {
+  public AtomicTask parseTaskLine(String line) {
     Matcher matcher = TASK_LINE_PATTERN.matcher(line);
     if (matcher.matches()) {
       String name = matcher.group(1).trim();
@@ -41,7 +48,7 @@ public class Parser {
         progress = Integer.parseInt(matcher.group(6).trim());
       }
 
-      Task task = new Task();
+      AtomicTask task = new AtomicTask();
       task.setName(name);
       task.setOwner(owner);
       task.setCost(Double.valueOf(manDays * 2).intValue());
@@ -112,7 +119,7 @@ public class Parser {
     Header header = Header.create();
     for (String line : lines) {
       line = line.trim();
-      Task task = parseTaskLine(line);
+      AtomicTask task = parseTaskLine(line);
       if (task != null) {
         task.setHeader(header);
         tasks.add(task);

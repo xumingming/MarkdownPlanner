@@ -2,8 +2,8 @@ package jash.web;
 
 import java.util.List;
 
-import jash.parser.ProjectStat;
-import jash.parser.ProjectStat.UserStat;
+import jash.model.ProjectStat;
+import jash.model.ProjectStat.UserStat;
 import lombok.Data;
 
 @Data

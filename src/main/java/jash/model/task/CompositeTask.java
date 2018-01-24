@@ -1,4 +1,4 @@
-package jash.parser;
+package jash.model.task;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -6,8 +6,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Joiner;
+import jash.model.Header;
 
-public class CompositeTask extends Task {
+public class CompositeTask extends AbstractTask {
     private Map<String, Integer> owner2Cost = new HashMap<>();
     private Map<String, Double> owner2FinishedCost = new HashMap<>();
 
@@ -39,16 +40,6 @@ public class CompositeTask extends Task {
 
         owner2Cost.put(owner, owner2Cost.get(owner) + cost);
         owner2FinishedCost.put(owner, owner2FinishedCost.get(owner) + finishedCost);
-    }
-
-    @Override
-    public void setCost(int cost) {
-        throw new UnsupportedOperationException("CompositeTask.setCost is not supported!");
-    }
-
-    @Override
-    public void setProgress(int progress) {
-        throw new UnsupportedOperationException("CompositeTask.setProgress is not supported!");
     }
 
     @Override
