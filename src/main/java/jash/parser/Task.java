@@ -30,6 +30,8 @@ public class Task implements ITask {
     /** offset from ProjectStartDate(Unit: HalfDay) */
     protected int startOffset;
     protected int endOffset;
+    /** 已经消耗掉的Cost */
+    protected int usedCost;
 
     public Task(Header header, LocalDate projectStartDate, String name, String owner, int cost, int progress, int startOffset, int endOffset) {
         this.header = header;
@@ -40,6 +42,10 @@ public class Task implements ITask {
         this.progress = progress;
         this.startOffset = startOffset;
         this.endOffset = endOffset;
+    }
+
+    public Task(String name, String owner, int cost) {
+        this(name, owner, cost, 0);
     }
 
     public Task(String name, String owner, int cost, int progress) {
@@ -58,7 +64,7 @@ public class Task implements ITask {
     }
 
     public double getFinishedCost() {
-        return getProgress() * getCost() / 100;
+        return 1.0 * getProgress() * getCost() / 100;
     }
 
     public JashDate getStartDate() {
@@ -72,8 +78,9 @@ public class Task implements ITask {
     public boolean isStarted() {
         return getProgress() > 0;
     }
+
     public boolean isDelayed() {
-        return getProgress() < 100 && LocalDate.now().compareTo(getEndDate().getDate()) > 0;
+        return getProgress() < getExpectedProgress();
     }
 
     public boolean isCompleted() {
@@ -82,5 +89,16 @@ public class Task implements ITask {
 
     public boolean isComposite() {
         return false;
+    }
+
+    public int getExpectedProgress() {
+        double ret = 1.0 * getUsedCost() * 100 / getCost();
+
+        int intRet = Double.valueOf(ret).intValue();
+        return intRet > 100 ? 100 : intRet;
+    }
+
+    public boolean isFullyPopulated() {
+        return this.endOffset > 0;
     }
 }

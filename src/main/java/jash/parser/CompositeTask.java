@@ -8,8 +8,12 @@ import java.util.stream.Collectors;
 import com.google.common.base.Joiner;
 
 public class CompositeTask extends Task {
-    private Map<String, Integer> owner2ManDays = new HashMap<>();
+    private Map<String, Integer> owner2Cost = new HashMap<>();
     private Map<String, Double> owner2FinishedCost = new HashMap<>();
+
+    public CompositeTask(Header header, String name) {
+        this(header, name, null);
+    }
 
     public CompositeTask(Header header, String name, LocalDate projectStartDate) {
         this.name = name;
@@ -20,7 +24,7 @@ public class CompositeTask extends Task {
     @Override
     public String getOwner() {
         return Joiner.on("/").join(
-            this.owner2ManDays.entrySet().stream()
+            this.owner2Cost.entrySet().stream()
                 .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList())
@@ -28,14 +32,31 @@ public class CompositeTask extends Task {
     }
 
     public void addOwnerCost(String owner, int cost, double finishedCost) {
-        if (!owner2ManDays.containsKey(owner)) {
-            owner2ManDays.put(owner, 0);
+        if (!owner2Cost.containsKey(owner)) {
+            owner2Cost.put(owner, 0);
             owner2FinishedCost.put(owner, 0.0);
         }
 
-        owner2ManDays.put(owner, owner2ManDays.get(owner) + cost);
+        owner2Cost.put(owner, owner2Cost.get(owner) + cost);
         owner2FinishedCost.put(owner, owner2FinishedCost.get(owner) + finishedCost);
-        this.cost += cost;
+    }
+
+    @Override
+    public void setCost(int cost) {
+        throw new UnsupportedOperationException("CompositeTask.setCost is not supported!");
+    }
+
+    @Override
+    public void setProgress(int progress) {
+        throw new UnsupportedOperationException("CompositeTask.setProgress is not supported!");
+    }
+
+    @Override
+    public int getCost() {
+        double ret = this.owner2Cost.values()
+            .stream().reduce((a, b) -> a + b).get();
+
+        return Double.valueOf(ret).intValue();
     }
 
     @Override
@@ -48,7 +69,7 @@ public class CompositeTask extends Task {
 
     @Override
     public int getProgress() {
-        return Double.valueOf(getFinishedCost() * 100 / cost).intValue();
+        return Double.valueOf(getFinishedCost() * 100 / getCost()).intValue();
     }
 
     @Override

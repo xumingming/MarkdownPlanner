@@ -23,8 +23,15 @@ public class Converters {
         taskVO.setComposite(false);
         taskVO.setStartDate(task.getStartDate().toString());
         taskVO.setEndDate(task.getEndDate().toString());
-        taskVO.setProgress(task.getProgress());
+
+        String progress = task.getProgress() + "%";
+        if (task.isDelayed()) {
+            progress += "(期望:" + task.getExpectedProgress() + "%)";
+        }
+        taskVO.setProgress(progress);
+
         taskVO.setManDays(String.format("%.1f", task.getCost() / 2.0));
+        // compute background color
         String bgColorClass = "jash-bg-secondary";
         if (task.isStarted()) {
             bgColorClass = "jash-bg-primary";
@@ -38,8 +45,8 @@ public class Converters {
                 bgColorClass = "jash-bg-danger";
             }
         }
-
         taskVO.setBgColorClass(bgColorClass);
+
         taskVO.setComposite(task.isComposite());
         return taskVO;
     }
