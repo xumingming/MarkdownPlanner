@@ -44,6 +44,9 @@ public class Utils {
 
     public static String getCurrentFilePath(HttpServletRequest req) {
         String path = (String)req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        if (path.endsWith(".json")) {
+            path = path.substring(0, path.length() - 5);
+        }
         return Application.ROOT + path;
     }
 

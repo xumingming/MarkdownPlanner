@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import jash.model.task.AtomicTask;
 import jash.model.task.CompositeTask;
 import jash.model.Header;
 import jash.model.task.Task;
@@ -29,6 +30,7 @@ public class Converters {
             progress += "(期望:" + task.getExpectedProgress() + "%)";
         }
         taskVO.setProgress(progress);
+        taskVO.setRawProgress(task.getProgress());
 
         taskVO.setManDays(String.format("%.1f", task.getCost() / 2.0));
         // compute background color
@@ -46,8 +48,10 @@ public class Converters {
             }
         }
         taskVO.setBgColorClass(bgColorClass);
-
         taskVO.setComposite(task.isComposite());
+        if (!task.isComposite()) {
+            taskVO.setLineNumber(((AtomicTask)task).getLineNumber());
+        }
         return taskVO;
     }
 

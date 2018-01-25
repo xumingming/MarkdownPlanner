@@ -22,6 +22,10 @@ public class TaskVO {
     private String endDate;
     /** 进度 */
     private String progress;
+    /** 进度 */
+    private int rawProgress;
     /** 显示颜色 */
     private String bgColorClass;
+    /** 行号 */
+    private int lineNumber;
 }

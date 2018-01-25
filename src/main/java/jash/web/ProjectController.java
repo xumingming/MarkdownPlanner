@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.HandlerMapping;
@@ -74,13 +77,21 @@ public class ProjectController {
         return "directory";
     }
 
-    @RequestMapping(value = "/**/*.plan.md.json")
+    @RequestMapping(value = "/**/*.plan.md.json", params = "action=getPercentageStat")
     public @ResponseBody
     PercentageStat projectJson(HttpServletRequest req) throws Exception {
         String filePath = getCurrentFilePath(req);
-        filePath = filePath.substring(0, filePath.length() - 5);
         Project project = planService.getProject(filePath);
         return project.getStat().getNotFinishedStat();
+    }
+
+    @RequestMapping(value = "/**/*.plan.md.json", params = "action=updateTaskProgress", method = RequestMethod.POST)
+    public @ResponseBody
+    Map updateTaskProgress(HttpServletRequest req, String name,
+        int oldProgress, int newProgress, int lineNumber) throws Exception {
+        String filePath = getCurrentFilePath(req);
+        planService.updateTaskProgress(filePath, name, oldProgress, newProgress, lineNumber);
+        return new HashMap();
     }
 
     @RequestMapping(value = "/**/*.plan.md")

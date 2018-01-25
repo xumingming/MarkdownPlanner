@@ -16,16 +16,16 @@ function getUrl() {
     var path = $("#path").val();
 
     return {
-	man: man,
-	status: status,
-	path: path
+	    man: man,
+	    status: status,
+	    path: path
     }
 }
 
 $(document).ready(function() {
     var ctx = document.getElementById("myChart").getContext('2d');
     var url = getUrl();
-    $.get(url.path + ".json", url, function(data) {
+    $.get(url.path + ".json?action=getPercentageStat", url, function(data) {
 	// And for a doughnut chart
 	var myDoughnutChart = new Chart(ctx, {
             type: 'doughnut',
@@ -37,7 +37,7 @@ $(document).ready(function() {
 		labels: data.users
             },
             options: {}
-	});	
+	});
     });
-    
+
 });
