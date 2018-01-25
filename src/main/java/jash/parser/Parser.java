@@ -33,7 +33,7 @@ public class Parser {
       Pattern.compile("^\\*(.+?)--\\s*([0-9]{4}-[0-9]{2}-[0-9]{2})(\\s*-\\s*([0-9]{4}-[0-9]{2}-[0-9]{2}))?\\s*$");
 
 
-  public AtomicTask parseTaskLine(String line) {
+  public static AtomicTask parseTaskLine(String line) {
     Matcher matcher = TASK_LINE_PATTERN.matcher(line);
     if (matcher.matches()) {
       String name = matcher.group(1).trim();
@@ -116,12 +116,15 @@ public class Parser {
     LocalDate projectStartDate = null;
     String name = null;
 
+    int lineNumber = 0;
     Header header = Header.create();
     for (String line : lines) {
+      lineNumber++;
       line = line.trim();
       AtomicTask task = parseTaskLine(line);
       if (task != null) {
         task.setHeader(header);
+        task.setLineNumber(lineNumber);
         tasks.add(task);
         continue;
       }

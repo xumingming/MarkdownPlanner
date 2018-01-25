@@ -14,7 +14,7 @@ import lombok.ToString;
  */
 @Setter
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "lineNumber")
 @ToString
 @NoArgsConstructor
 public class AtomicTask extends AbstractTask implements Task {
@@ -24,6 +24,8 @@ public class AtomicTask extends AbstractTask implements Task {
     protected int cost;
     /** progress */
     protected int progress;
+    /** 所在行号 */
+    protected int lineNumber;
 
     public AtomicTask(String name, String owner, int cost) {
         this(name, owner, cost, 0);

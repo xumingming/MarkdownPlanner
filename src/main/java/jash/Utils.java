@@ -1,10 +1,15 @@
 package jash;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerMapping;
 
@@ -44,5 +49,26 @@ public class Utils {
 
     public static boolean isRequestingADir(HttpServletRequest req) {
         return new File(getCurrentDirectoryPath(req)).isDirectory();
+    }
+
+    public static List<String> readFile(String filePath) {
+        List<String> lines;
+        File file = new File(filePath);
+        try (FileInputStream stream = new FileInputStream(file)) {
+            lines = IOUtils.readLines(stream, "UTF-8");
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to read project: " + filePath);
+        }
+        return lines;
+    }
+
+    public static void writeFile(String filePath, String newContent) {
+        List<String> lines = new ArrayList<>();
+        File file = new File(filePath);
+        try (FileOutputStream stream = new FileOutputStream(file)) {
+            IOUtils.write(newContent, stream, "UTF-8");
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to write project: " + filePath);
+        }
     }
 }

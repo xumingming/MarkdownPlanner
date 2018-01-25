@@ -1,17 +1,21 @@
 package jash.service;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import jash.parser.Parser;
+import com.google.common.base.Joiner;
 import jash.model.Project;
-import org.apache.commons.io.IOUtils;
+import jash.model.task.AtomicTask;
+import jash.model.task.Task;
+import jash.parser.Parser;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static jash.Utils.readFile;
+import static jash.Utils.writeFile;
 
 @Service("planService")
 public class PlanServiceImpl implements PlanService {
@@ -23,7 +27,6 @@ public class PlanServiceImpl implements PlanService {
     }
 
     public Project getProject(String filePath, String man, String status, List<String> keywords, boolean reverse) {
-        File file = new File(filePath);
         // get from cache
         Project fullProject = projectCacheService.get(filePath);
         if (fullProject == null) {
@@ -31,19 +34,54 @@ public class PlanServiceImpl implements PlanService {
                 LOG.info("Read project(" + filePath + ") from disk.");
             }
 
-            try (FileInputStream stream = new FileInputStream(file)) {
-                List<String> lines = IOUtils.readLines(stream, "UTF-8");
-                Parser parser = new Parser();
-                fullProject = parser.parse(lines);
+            List<String> lines = readFile(filePath);
 
-                projectCacheService.set(filePath, fullProject);
-            } catch (Exception e) {
-                LOG.error("", e);
-                return null;
-            }
+            Parser parser = new Parser();
+            fullProject = parser.parse(lines);
+
+            projectCacheService.set(filePath, fullProject);
         }
 
         return filterProject(fullProject, man, status, keywords, reverse);
+    }
+
+    @Override
+    public void updateTaskProgress(String filePath, String name, int oldProgress, int newProgress, int lineNumber) {
+        Project project = getProject(filePath);
+        if (project == null) {
+            throw new IllegalArgumentException("No such project: " + filePath);
+        }
+
+        // 搜索出指定行号的任务
+        List<Task> tasks = project.getTasks().stream()
+            .filter(t -> !t.isComposite())
+            .filter(t -> {
+                AtomicTask atomicTask = (AtomicTask) t;
+                return atomicTask.getLineNumber() == lineNumber;
+            }).collect(Collectors.toList());
+
+        if (tasks.isEmpty() || tasks.size() > 1) {
+            throw new IllegalArgumentException("No task or more than one task has the lineNumber: " + lineNumber);
+        }
+
+        AtomicTask targetTask = (AtomicTask) tasks.get(0);
+        if (!targetTask.getName().equals(name) || targetTask.getProgress() != oldProgress) {
+            throw new IllegalArgumentException("Project is modified after you last fetch! Try to refresh the page & try again");
+        }
+
+        List<String> lines = readFile(filePath);
+        String targetLine = lines.get(lineNumber - 1);
+
+        String newTargetLine;
+        // 原来的计划里面因为progress为0所以压根就没有写
+        if (oldProgress == 0 && !targetLine.contains("[" + oldProgress + "%]")) {
+            newTargetLine = targetLine.trim() + "[" + newProgress + "%]";
+        } else {
+            newTargetLine = targetLine.replaceAll("\\[" + oldProgress + "%]", "[" + newProgress + "%]");
+        }
+
+        lines.set(lineNumber - 1, newTargetLine);
+        writeFile(filePath, Joiner.on("\n").join(lines));
     }
 
     private Project filterProject(Project fullProject, String man,
@@ -71,5 +109,9 @@ public class PlanServiceImpl implements PlanService {
             project = project.filterKeywords(keywords, reverse);
         }
         return project;
+    }
+
+    public void setProjectCacheService(CacheService<Project> projectCacheService) {
+        this.projectCacheService = projectCacheService;
     }
 }

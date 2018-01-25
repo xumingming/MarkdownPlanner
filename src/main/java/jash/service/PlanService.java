@@ -20,4 +20,15 @@ public interface PlanService {
      * @return
      */
     Project getProject(String filePath, String man, String status, List<String> keywords, boolean reverse);
+
+    /**
+     * 更新任务进度
+     * @param filePath
+     * @param name
+     * @param oldProgress
+     * @param newProgress
+     * @param lineNumber
+     * @return
+     */
+    void updateTaskProgress(String filePath, String name, int oldProgress, int newProgress, int lineNumber);
 }
