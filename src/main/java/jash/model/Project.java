@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import jash.model.ProjectStat.UserStat;
+import jash.model.task.CompositeTask;
 import jash.model.task.Task;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -387,6 +388,13 @@ public class Project {
         ret.setActualCost(actualCost);
         ret.setDate(currentDate);
         return ret;
+    }
+
+    public CompositeTask getRootTask() {
+        return (CompositeTask) this.tasks.stream()
+            .filter(Task::isComposite)
+            .filter(t -> t.getId() == 0)
+            .findFirst().get();
     }
 
     @Data
