@@ -17,29 +17,14 @@
 <body>
     <div class="container">
         <input type="hidden" id="path" th:attr="value=${path}" />
-        <div>
-            <nav class="navbar navbar-default">
-                <div class="container">
-                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        <ol class="breadcrumb" style="float:left;position:relative;top:10px">
-                            <li th:each="file : ${breadcrumb.links}">
-                                <a th:if="${file.isDir()}" th:text="${file.name}" th:attr='href=${file.url}'></a>
-                                <span th:unless="${file.isDir()}" th:text="${file.name}"></span>
-                            </li>
-                        </ol>
-
-                        <ul class="nav navbar-nav" style="float:right">
-                            <form class="navbar-form navbar-left" role="search" action="/search" method="GET">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Search" name="w" />
-                                </div>
-                                <button type="submit" class="btn btn-default">Search</button>
-                            </form>
-                        </ul>
-                    </div><!-- /.navbar-collapse -->
-                </div><!-- /.container-fluid -->
-            </nav>
-        </div>
+        <nav class="navbar" style="margin-bottom:1px">
+            <ol class="breadcrumb" style="float:left;position:relative;top:10px">
+                <li th:each="file : ${breadcrumb.links}">
+                    <a th:if="${file.isDir()}" th:text="${file.name}" th:attr='href=${file.url}'></a>
+                    <span th:unless="${file.isDir()}" th:text="${file.name}"></span>
+                </li>
+            </ol>
+        </nav>
 
         <div class="toolbar" style="margin-bottom: 5px">
             <form method="GET">
