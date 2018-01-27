@@ -31,24 +31,24 @@ table {
     font-size: 12px;
 }
 
-#example-advanced .jash-bg-warning {
+#example-advanced .markdownplanner-bg-warning {
     background-color: #fcf8e3
 }
 
-#example-advanced .jash-bg-success {
+#example-advanced .markdownplanner-bg-success {
     background-color: #dff0d8
 }
 
-#example-advanced .jash-bg-primary {
+#example-advanced .markdownplanner-bg-primary {
     background-color: #17a2b8;
     color: #fff;
 }
 
-#example-advanced .jash-bg-secondary {
+#example-advanced .markdownplanner-bg-secondary {
     background-color: #f8f9fa;
 }
 
-#example-advanced .jash-bg-danger {
+#example-advanced .markdownplanner-bg-danger {
     background-color: #f2dede
 }
 
