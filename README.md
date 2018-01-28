@@ -58,7 +58,7 @@ mvn package
 mkdir -vp /tmp/test
 cp test.plan.md /tmp/test
 cd /tmp/test
-java -jar /path/to/your/MarkdownPlanner/MarkdownPlanner-0.1.0.jar --server.port=9999
+java -jar /path/to/your/MarkdownPlanner/target/MarkdownPlanner-0.1.0.jar --server.port=9999
 ```
 
 现在打开浏览器访问 [http://localhost:9999/test.plan.md](http://localhost:9999/test.plan.md) 就可以访问到这个项目的页面了，祝你用得开心 :)。
