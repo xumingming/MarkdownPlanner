@@ -52,7 +52,7 @@ cd MarkdownPlanner
 mvn package
 ```
 
-下面复制测试项目文件: `docs/test.plan.md` 到任意目录(比如`/tmp/test`), 然后到这个目录下面启动`MarkdownPlanner`:
+下面复制测试项目文件: `test.plan.md` 到任意目录(比如`/tmp/test`), 然后到这个目录下面启动`MarkdownPlanner`:
 
 ``` bash
 mkdir -vp /tmp/test
