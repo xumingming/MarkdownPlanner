@@ -59,7 +59,7 @@ public class Converters {
         projectVO.setMen(project.getMen());
         projectVO.setProjectStartDate(project.getProjectStartDate().toString());
         projectVO.setProjectEndDate(project.getProjectEndDate().toString());
-        projectVO.setStat(project.getStat());
+        projectVO.setUserStats(project.getUserStats());
 
         return projectVO;
     }

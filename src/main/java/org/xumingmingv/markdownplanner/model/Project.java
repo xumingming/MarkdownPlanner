@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
-import org.xumingmingv.markdownplanner.model.ProjectStat.UserStat;
 import org.xumingmingv.markdownplanner.model.task.CompositeTask;
 import org.xumingmingv.markdownplanner.model.task.Task;
 import lombok.Data;
@@ -37,7 +36,7 @@ public class Project implements IProject {
     /** 所有的请假安排 */
     private List<Vacation> vacations;
     /** 项目统计信息 */
-    private ProjectStat stat;
+    private Map<String, UserStat> userStats;
 
     public Project(String name, LocalDate projectStartDate, List<Task> tasks, List<Vacation> vacations) {
         this.name = name;
@@ -104,8 +103,7 @@ public class Project implements IProject {
         // 按照用户对原子任务进行分组
         Map<String, List<Task>> user2Tasks = groupAtomicTasksByOwner();
         // 生成用户统计信息
-        Map<String, UserStat> userStats = generateUserStat();
-        stat = new ProjectStat(userStats);
+        userStats = generateUserStat();
         // 初始化原子任务
         initAtomicTasks(user2Tasks);
         treenify();
@@ -356,12 +354,10 @@ public class Project implements IProject {
             vacations
         );
     }
-    public UserStat getUserStat(String user) {
-        return stat.getUserStat(user);
-    }
 
-    public UserStat getTotalStat() {
-        return stat.getTotalStat();
+    @Override
+    public UserStat getUserStat(String user) {
+        return userStats.get(user);
     }
 
     public LocalDate getProjectEndDate() {

@@ -3,13 +3,10 @@ package org.xumingmingv.markdownplanner.model;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.xumingmingv.markdownplanner.model.ProjectStat.UserStat;
 import org.xumingmingv.markdownplanner.model.task.CompositeTask;
 import org.xumingmingv.markdownplanner.model.task.Task;
 
@@ -21,10 +18,6 @@ public class SummaryProject implements IProject {
 
     public static boolean isSummaryProject(String filePath) {
         return filePath.endsWith(FILE_NAME);
-    }
-
-    public SummaryProject() {
-
     }
 
     @Override
@@ -84,6 +77,7 @@ public class SummaryProject implements IProject {
 
         projects.stream()
             .map(p -> p.getUserStat(user))
+            .filter(x -> x != null)
             .forEach(stat -> {
                 ret.addTotalCost(stat.getTotalCost());
                 ret.addFinishedCost(stat.getFinishedCost());
@@ -143,24 +137,5 @@ public class SummaryProject implements IProject {
         projects.forEach(p -> ret.addAll(p.getVacations()));
 
         return ret;
-    }
-
-    @Override
-    public ProjectStat getStat() {
-        Map<String, UserStat> userStatMap = new HashMap<>();
-        this.projects.forEach(p -> {
-            Map<String, UserStat> tmpUserStatMap = p.getStat().getUserStatMap();
-            for (String user : tmpUserStatMap.keySet()) {
-                UserStat currentUserStat = tmpUserStatMap.get(user);
-                if (!userStatMap.containsKey(user)) {
-                    userStatMap.put(user, new UserStat());
-                }
-
-                UserStat userStat = userStatMap.get(user);
-                userStat.addTotalCost(currentUserStat.getTotalCost());
-                userStat.addFinishedCost(currentUserStat.getFinishedCost());
-            }
-        });
-        return new ProjectStat(userStatMap);
     }
 }

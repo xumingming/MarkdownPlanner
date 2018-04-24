@@ -2,8 +2,10 @@ package org.xumingmingv.markdownplanner.model;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import org.xumingmingv.markdownplanner.model.ProjectStat.UserStat;
 import org.xumingmingv.markdownplanner.model.task.CompositeTask;
 import org.xumingmingv.markdownplanner.model.task.Task;
 
@@ -35,7 +37,19 @@ public interface IProject {
      * 获取整个项目的统计信息
      * @return
      */
-    UserStat getTotalStat();
+    default UserStat getTotalStat() {
+        UserStat totalStat = new UserStat();
+        totalStat.setUser("-- 总记 --");
+        List<String> users = getMen();
+        users.stream()
+            .forEach(user -> {
+                UserStat stat = getUserStat(user);
+                totalStat.addTotalCost(stat.getTotalCost());
+                totalStat.addFinishedCost(stat.getFinishedCost());
+            });
+
+        return totalStat;
+    }
 
     /**
      * 获取每个人的统计信息
@@ -43,6 +57,16 @@ public interface IProject {
      * @return
      */
     UserStat getUserStat(String user);
+
+    /**
+     *
+     * @return
+     */
+    default Map<String, UserStat> getUserStats() {
+        return getMen().stream()
+            .map(x -> getUserStat(x))
+            .collect(Collectors.toMap(UserStat::getUser, Function.identity()));
+    }
 
     /**
      * 获取根任务
@@ -61,6 +85,4 @@ public interface IProject {
      * @return
      */
     List<Vacation> getVacations();
-
-    ProjectStat getStat();
 }
