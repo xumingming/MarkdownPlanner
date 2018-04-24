@@ -360,14 +360,6 @@ public class Project implements IProject {
         return userStats.get(user);
     }
 
-    public LocalDate getProjectEndDate() {
-        Optional<HalfDayPrecisionDate> ret = this.tasks.stream()
-            .map(Task::getEndDate)
-            .max(Comparator.comparing(HalfDayPrecisionDate::getDate));
-
-        return ret.isPresent() ? ret.get().getDate() : null;
-    }
-
     public int calculateEndOffset(int lastOffset, int numOfHalfDays, String owner) {
         LocalDate currentDate = new HalfDayDuration(lastOffset).addToDate(projectStartDate).getDate();
         NextManDay nextManDay = advanceCost(owner, currentDate, numOfHalfDays);
@@ -445,13 +437,6 @@ public class Project implements IProject {
         ret.setActualCost(actualCost);
         ret.setDate(currentDate);
         return ret;
-    }
-
-    public CompositeTask getRootTask() {
-        return (CompositeTask) this.tasks.stream()
-            .filter(Task::isComposite)
-            .filter(t -> t.getId() == 0)
-            .findFirst().get();
     }
 
     @Data

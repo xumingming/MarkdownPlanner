@@ -1,8 +1,10 @@
 package org.xumingmingv.markdownplanner.model;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,7 +27,13 @@ public interface IProject {
      * 获取项目结束时间
      * @return
      */
-    LocalDate getProjectEndDate();
+    default LocalDate getProjectEndDate() {
+        Optional<HalfDayPrecisionDate> ret = getTasks().stream()
+            .map(Task::getEndDate)
+            .max(Comparator.comparing(HalfDayPrecisionDate::getDate));
+
+        return ret.isPresent() ? ret.get().getDate() : null;
+    }
 
     /**
      * 获取参与项目的所有人员
@@ -72,7 +80,12 @@ public interface IProject {
      * 获取根任务
      * @return
      */
-    CompositeTask getRootTask();
+    default CompositeTask getRootTask() {
+        return (CompositeTask) this.getTasks().stream()
+            .filter(Task::isComposite)
+            .filter(t -> t.getId() == 0)
+            .findFirst().get();
+    }
 
     /**
      * 获取项目里面的所有任务

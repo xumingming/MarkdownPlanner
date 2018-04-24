@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.xumingmingv.markdownplanner.model.task.CompositeTask;
@@ -39,36 +38,12 @@ public class SummaryProject implements IProject {
     }
 
     @Override
-    public LocalDate getProjectEndDate() {
-        Optional<HalfDayPrecisionDate> ret = this.getTasks().stream()
-            .map(Task::getEndDate)
-            .max(Comparator.comparing(HalfDayPrecisionDate::getDate));
-
-        return ret.isPresent() ? ret.get().getDate() : null;
-    }
-
-    @Override
     public List<String> getMen() {
         return projects.stream()
             .map(IProject::getMen)
             .flatMap(List::stream)
             .distinct()
             .collect(Collectors.toList());
-    }
-
-    @Override
-    public UserStat getTotalStat() {
-        UserStat ret = new UserStat();
-
-        projects.stream()
-            .map(IProject::getTotalStat)
-            .forEach(stat -> {
-                ret.addTotalCost(stat.getTotalCost());
-                ret.addFinishedCost(stat.getFinishedCost());
-            });
-
-        ret.setUser("-- 总计 --");
-        return ret;
     }
 
     @Override
@@ -85,14 +60,6 @@ public class SummaryProject implements IProject {
 
         ret.setUser(user);
         return ret;
-    }
-
-    @Override
-    public CompositeTask getRootTask() {
-        return (CompositeTask) this.getTasks().stream()
-            .filter(Task::isComposite)
-            .filter(t -> t.getId() == 0)
-            .findFirst().get();
     }
 
     @Override
