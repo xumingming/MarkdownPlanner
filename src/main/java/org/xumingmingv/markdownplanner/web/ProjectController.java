@@ -20,6 +20,7 @@ import com.vladsch.flexmark.util.options.MutableDataSet;
 import org.xumingmingv.markdownplanner.Application;
 import org.xumingmingv.markdownplanner.model.Project;
 import org.xumingmingv.markdownplanner.model.ProjectStat.PercentageStat;
+import org.xumingmingv.markdownplanner.service.ConfigService;
 import org.xumingmingv.markdownplanner.service.PlanService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,8 @@ import org.xumingmingv.markdownplanner.Utils;
 public class ProjectController {
     @Autowired
     private PlanService planService;
+    @Autowired
+    private ConfigService configService;
 
     @RequestMapping(value = "/")
     public String index(HttpServletRequest req, Model model) throws Exception {
@@ -117,6 +120,7 @@ public class ProjectController {
         model.addAttribute("selectedReverse", reverse);
         model.addAttribute("breadcrumb", new BreadcrumVO(Application.ROOT, filePath));
         model.addAttribute("article", renderMarkdown(filePath));
+        model.addAttribute("editable", configService.isEditEnabled());
 
         return "project";
     }

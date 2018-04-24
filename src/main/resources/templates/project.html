@@ -118,7 +118,7 @@
                             <th>开始时间</th>
                             <th>结束时间</th>
                             <th>进度</th>
-                            <th>操作</th>
+                            <th th:if="${editable}">操作</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -141,7 +141,7 @@
                                           th:attr="data-name=${task.name}, data-progress=${task.rawProgress}, data-lineNumber=${task.lineNumber}"
                                           onclick="updateTaskProgress(this)"></span>
                                 </td>
-                                <td>
+                                <td th:if="${editable}">
                                     <a th:unless="${task.composite}"
                                        th:attr="data-name=${task.name}, data-progress=${task.rawProgress}, data-lineNumber=${task.lineNumber}"
                                        onclick="showUpdateTaskProgressModal(this)">
