@@ -18,6 +18,8 @@ import lombok.Value;
  */
 @ToString
 @EqualsAndHashCode
+@Setter
+@Getter
 public class ProjectStat {
     private List<UserStat> userStats;
     private Map<String, UserStat> userStatMap;
@@ -25,14 +27,6 @@ public class ProjectStat {
     public ProjectStat(Map<String, UserStat> userStatMap) {
         this.userStatMap = userStatMap;
         this.userStats = userStatMap.values().stream().collect(Collectors.toList());
-    }
-
-    public PercentageStat getNotFinishedStat() {
-        List<String> users = userStats.stream().map(UserStat::getUser).collect(Collectors.toList());
-        List<Double> percentages = userStats.stream()
-            .map(ut -> formatDouble(ut.getNotFinishedManDays()))
-            .collect(Collectors.toList());
-        return new PercentageStat(users, percentages);
     }
 
     public UserStat getUserStat(String user) {

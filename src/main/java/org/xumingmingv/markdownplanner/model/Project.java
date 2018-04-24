@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -26,7 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 @Getter
 @ToString
 @EqualsAndHashCode(exclude = {"stat"})
-public class Project {
+public class Project implements IProject {
     /** 名字 */
     private String name;
     /** 项目开始时间 */
@@ -107,8 +108,68 @@ public class Project {
         stat = new ProjectStat(userStats);
         // 初始化原子任务
         initAtomicTasks(user2Tasks);
+        treenify();
         // 初始化复合任务
         initCompositeTasks();
+    }
+
+    void treenify() {
+        List<Task> tasks = new ArrayList<>();
+
+        // 先建一个“根”任务
+        CompositeTask rootTask = new CompositeTask(Header.create(), this.name, this.projectStartDate);
+        rootTask.setId(0);
+        rootTask.setParentId(-1);
+        Map<Header, CompositeTask> compositeTaskMap = new HashMap<>();
+        compositeTaskMap.put(rootTask.getHeader(), rootTask);
+
+        AtomicInteger idCounter = new AtomicInteger();
+        for (Task task : this.tasks) {
+            Header header = task.getHeader();
+            addCompositeTaskIfNeeded(tasks, rootTask, compositeTaskMap, idCounter, header);
+
+            CompositeTask parentTask = compositeTaskMap.get(task.getHeader());
+            task.setId(idCounter.incrementAndGet());
+            task.setParentId(parentTask.getId());
+            tasks.add(task);
+
+            addCosts(compositeTaskMap, header, task.getOwner(), task.getCost(), task.getFinishedCost());
+        }
+        tasks.add(0, rootTask);
+
+        this.tasks = tasks;
+    }
+
+    void addCosts(Map<Header, CompositeTask> compositeTaskMap, Header header, String owner, int cost, double finishedCost) {
+        for (int i = 0; i <= header.getHeaders().size(); i++) {
+            Header currentHeader = new Header(header.getHeaders().subList(0, i));
+            compositeTaskMap.get(currentHeader).addOwnerCost(owner, cost, finishedCost);
+        }
+    }
+
+    void addCompositeTaskIfNeeded(List<Task> tasks, CompositeTask rootTask, Map<Header, CompositeTask> compositeTaskMap,
+        AtomicInteger idCounter, Header header) {
+        for (int i = 0; i < header.getHeaders().size(); i++) {
+            Header currentHeader = new Header(header.getHeaders().subList(0, i + 1));
+
+            if (!compositeTaskMap.containsKey(currentHeader)) {
+                CompositeTask currentTask = new CompositeTask(
+                    currentHeader, header.getHeaders().get(i).getDisplay(), rootTask.getProjectStartDate()
+                );
+                currentTask.setId(idCounter.incrementAndGet());
+                if (i == 0) {
+                    currentTask.setParentId(rootTask.getId());
+                } else {
+                    currentTask.setParentId(
+                        compositeTaskMap.get(
+                            new Header(header.getHeaders().subList(0, i))
+                        ).getId()
+                    );
+                }
+                compositeTaskMap.put(currentHeader, currentTask);
+                tasks.add(currentTask);
+            }
+        }
     }
 
     void initCompositeTasks() {
@@ -125,19 +186,19 @@ public class Project {
                     .filter(Task::isFullyPopulated)
                     .count();
                 if (readyChildTaskCount == childrenTasks.size() && !task.isFullyPopulated()) {
-                    Optional<Integer> startOffset = getChildrenTasks(taskId).stream()
+                    Optional<Integer> startOffset = childrenTasks.stream()
                         .map(Task::getStartOffset)
-                        .min(Comparator.comparingInt(x -> x));
+                        .min(Comparator.naturalOrder());
                     Optional<Integer> endOffset = childrenTasks.stream()
                         .map(Task::getEndOffset)
-                        .max(Comparator.comparingInt(x -> x));
+                        .max(Comparator.naturalOrder());
                     Optional<Integer> usedCost = childrenTasks.stream()
                         .map(Task::getUsedCost)
                         .reduce((a, b) -> a + b);
 
-                    task.setStartOffset(startOffset.isPresent() ? startOffset.get() : 0);
-                    task.setEndOffset(endOffset.isPresent() ? endOffset.get() : 0);
-                    task.setUsedCost(usedCost.isPresent() ? usedCost.get() : 0);
+                    task.setStartOffset(startOffset.get());
+                    task.setEndOffset(endOffset.get());
+                    task.setUsedCost(usedCost.get());
                 }
             }
 

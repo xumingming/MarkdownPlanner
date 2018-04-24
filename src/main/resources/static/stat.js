@@ -21,23 +21,3 @@ function getUrl() {
 	    path: path
     }
 }
-
-$(document).ready(function() {
-    var ctx = document.getElementById("myChart").getContext('2d');
-    var url = getUrl();
-    $.get(url.path + ".json?action=getPercentageStat", url, function(data) {
-	// And for a doughnut chart
-	var myDoughnutChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-		datasets: [{
-                    data: data.percentages,
-		    backgroundColor: COLORS.slice(0, data.percentages.length)
-		}],
-		labels: data.users
-            },
-            options: {}
-	});
-    });
-
-});

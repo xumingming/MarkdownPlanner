@@ -1,10 +1,14 @@
 package org.xumingmingv.markdownplanner.service;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Joiner;
+import org.xumingmingv.markdownplanner.model.IProject;
 import org.xumingmingv.markdownplanner.model.Project;
+import org.xumingmingv.markdownplanner.model.SummaryProject;
 import org.xumingmingv.markdownplanner.model.task.AtomicTask;
 import org.xumingmingv.markdownplanner.model.task.Task;
 import org.xumingmingv.markdownplanner.parser.Parser;
@@ -20,22 +24,40 @@ public class PlanServiceImpl implements PlanService {
     private static final Logger LOG = LoggerFactory.getLogger(PlanServiceImpl.class);
     @Autowired
     private CacheService<Project> projectCacheService;
-    public Project getProject(String filePath) {
+    @Autowired
+    private ConfigService configService;
+    public IProject getProject(String filePath) {
         return getProject(filePath, null, null, null, false);
     }
 
-    public Project getProject(String filePath, String man, String status, List<String> keywords, boolean reverse) {
+    public IProject getProject(String filePath, String man, String status, List<String> keywords, boolean reverse) {
         // get from cache
-        Project fullProject = projectCacheService.get(filePath);
+        Project fullProject = null;
+        if (configService.isCacheEnabled()) {
+            fullProject = projectCacheService.get(filePath);
+        }
+
         if (fullProject == null) {
             if (LOG.isInfoEnabled()) {
                 LOG.info("Read project(" + filePath + ") from disk.");
             }
 
-            List<String> lines = Utils.readFile(filePath);
+            if (SummaryProject.isSummaryProject(filePath)) {
+                File parentDir = new File(filePath).getParentFile();
+                File[] subFiles = parentDir.listFiles();
+                List<File> planFiles = Arrays.stream(subFiles)
+                    .filter(f -> f.getAbsolutePath().endsWith(".plan.md"))
+                    .collect(Collectors.toList());
+                SummaryProject summaryProject = new SummaryProject();
+                planFiles.stream()
+                    .forEach(f -> {
+                        summaryProject.addProject(readProjectFromDisk(f.getAbsolutePath()));
+                    });
 
-            Parser parser = new Parser();
-            fullProject = parser.parse(lines);
+                return summaryProject;
+            } else {
+                fullProject = readProjectFromDisk(filePath);
+            }
 
             projectCacheService.set(filePath, fullProject);
         }
@@ -43,9 +65,17 @@ public class PlanServiceImpl implements PlanService {
         return filterProject(fullProject, man, status, keywords, reverse);
     }
 
+    private Project readProjectFromDisk(String filePath) {
+        Project fullProject;List<String> lines = Utils.readFile(filePath);
+
+        Parser parser = new Parser();
+        fullProject = parser.parse(lines);
+        return fullProject;
+    }
+
     @Override
     public void updateTaskProgress(String filePath, String name, int oldProgress, int newProgress, int lineNumber) {
-        Project project = getProject(filePath);
+        IProject project = getProject(filePath);
         if (project == null) {
             throw new IllegalArgumentException("No such project: " + filePath);
         }

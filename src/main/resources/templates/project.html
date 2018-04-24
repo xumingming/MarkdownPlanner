@@ -90,7 +90,7 @@
                 <li role="presentation">
                     <a href="#summary" aria-controls="profile" role="tab" data-toggle="tab">统计信息</a>
                 </li>
-                <li role="presentation">
+                <li role="presentation" th:if="${article}">
                     <a href="#markdown" aria-controls="markdown" role="tab" data-toggle="tab">源文件</a>
                 </li>
             </ul>
@@ -202,9 +202,6 @@
                         </tr>
                         </tbody>
                     </table>
-
-                    <h2>未完成任务比例</h2>
-                    <canvas id="myChart" width="100" height="50" class="well"></canvas>
                 </div>
             </div>
         </div>

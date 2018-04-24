@@ -6,4 +6,10 @@ public interface ConfigService {
      * @return
      */
     boolean isEditEnabled();
+
+    /**
+     * 是否使用缓存
+     * @return
+     */
+    boolean isCacheEnabled();
 }

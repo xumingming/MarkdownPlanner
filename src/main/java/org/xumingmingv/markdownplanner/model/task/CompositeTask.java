@@ -1,8 +1,11 @@
 package org.xumingmingv.markdownplanner.model.task;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Joiner;
@@ -24,12 +27,19 @@ public class CompositeTask extends AbstractTask {
 
     @Override
     public String getOwner() {
-        return Joiner.on("/").join(
+        List<String> users = new ArrayList<>(
             this.owner2Cost.entrySet().stream()
-                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList())
+            .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList())
         );
+
+        if (users.size() > 5) {
+            users = users.subList(0, 5);
+            users.add("...");
+        }
+
+        return Joiner.on("/").join(users);
     }
 
     public void addOwnerCost(String owner, int cost, double finishedCost) {
@@ -44,18 +54,18 @@ public class CompositeTask extends AbstractTask {
 
     @Override
     public int getCost() {
-        double ret = this.owner2Cost.values()
-            .stream().reduce((a, b) -> a + b).get();
+        Optional<Integer> ret = this.owner2Cost.values()
+            .stream().reduce((a, b) -> a + b);
 
-        return Double.valueOf(ret).intValue();
+        return ret.isPresent() ? Double.valueOf(ret.get()).intValue() : 0;
     }
 
     @Override
     public double getFinishedCost() {
-        double finishedCost = this.owner2FinishedCost.values()
-            .stream().reduce((a, b) -> a + b).get();
+        Optional<Double> finishedCost = this.owner2FinishedCost.values()
+            .stream().reduce((a, b) -> a + b);
 
-        return finishedCost;
+        return finishedCost.isPresent() ? finishedCost.get() : 0;
     }
 
     @Override

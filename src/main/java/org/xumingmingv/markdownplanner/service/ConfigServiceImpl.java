@@ -28,6 +28,16 @@ public class ConfigServiceImpl implements ConfigService {
         return config.getBoolean("editable");
     }
 
+    @Override
+    public boolean isCacheEnabled() {
+        JSONObject config = getConfig();
+        if (config == null || !config.containsKey("editable")) {
+            return true;
+        }
+
+        return config.getBoolean("useCache");
+    }
+
     static JSONObject getConfig() {
         if (!new File(getConfigFilePath()).exists()) {
             return null;

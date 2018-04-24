@@ -17,11 +17,6 @@ import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.util.options.MutableDataHolder;
 import com.vladsch.flexmark.util.options.MutableDataSet;
-import org.xumingmingv.markdownplanner.Application;
-import org.xumingmingv.markdownplanner.model.Project;
-import org.xumingmingv.markdownplanner.model.ProjectStat.PercentageStat;
-import org.xumingmingv.markdownplanner.service.ConfigService;
-import org.xumingmingv.markdownplanner.service.PlanService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +27,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.HandlerMapping;
+import org.xumingmingv.markdownplanner.Application;
 import org.xumingmingv.markdownplanner.Utils;
+import org.xumingmingv.markdownplanner.model.IProject;
+import org.xumingmingv.markdownplanner.model.SummaryProject;
+import org.xumingmingv.markdownplanner.service.ConfigService;
+import org.xumingmingv.markdownplanner.service.PlanService;
 
 @Controller
 public class ProjectController {
@@ -72,17 +72,25 @@ public class ProjectController {
             })
             .collect(Collectors.toList());
 
+        long planCount = Arrays.stream(
+            new File(filePath)
+            .listFiles(f -> !f.getName().startsWith("."))
+        ).filter(x -> x.getAbsolutePath().endsWith(".plan.md"))
+            .count();
+
+        if (planCount > 1) {
+             FileVO rootFileVo = new FileVO(
+                 SummaryProject.NAME,
+                 new File(filePath).getAbsolutePath().substring(Application.ROOT.length()) + "/" + SummaryProject.FILE_NAME,
+                 false
+             );
+             fileVOs = new ArrayList<>(fileVOs);
+             fileVOs.add(rootFileVo);
+        }
+
         model.addAttribute("files", fileVOs);
         model.addAttribute("breadcrumb", new BreadcrumVO(Application.ROOT, filePath));
         return "directory";
-    }
-
-    @RequestMapping(value = "/**/*.plan.md.json", params = "action=getPercentageStat")
-    public @ResponseBody
-    PercentageStat projectJson(HttpServletRequest req) throws Exception {
-        String filePath = Utils.getCurrentFilePath(req);
-        Project project = planService.getProject(filePath);
-        return project.getStat().getNotFinishedStat();
     }
 
     @RequestMapping(value = "/**/*.plan.md.json", params = "action=updateTaskProgress", method = RequestMethod.POST)
@@ -108,7 +116,7 @@ public class ProjectController {
             cleanedKeywords = Arrays.asList(keywords).stream()
                 .map(x -> x.trim()).collect(Collectors.toList());
         }
-        Project project = planService.getProject(filePath, man, status, cleanedKeywords, reverse);
+        IProject project = planService.getProject(filePath, man, status, cleanedKeywords, reverse);
         model.addAttribute("path",
             req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE));
 
@@ -119,7 +127,9 @@ public class ProjectController {
         model.addAttribute("selectedKeyword", keyword);
         model.addAttribute("selectedReverse", reverse);
         model.addAttribute("breadcrumb", new BreadcrumVO(Application.ROOT, filePath));
-        model.addAttribute("article", renderMarkdown(filePath));
+        if (!SummaryProject.isSummaryProject(filePath)) {
+            model.addAttribute("article", renderMarkdown(filePath));
+        }
         model.addAttribute("editable", configService.isEditEnabled());
 
         return "project";
