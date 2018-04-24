@@ -6,19 +6,20 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xumingmingv.markdownplanner.model.IProject;
 import org.xumingmingv.markdownplanner.model.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service("projectCacheService")
-public class ProjectCacheServiceImpl implements CacheService<Project> {
+public class ProjectCacheServiceImpl implements CacheService<IProject> {
     private static final Logger LOG = LoggerFactory.getLogger(ProjectCacheServiceImpl.class);
-    private Map<String, CacheItem<Project>> projectCache = new HashMap<>(16);
+    private Map<String, CacheItem<IProject>> projectCache = new HashMap<>(16);
 
     @Override
-    public Project get(String key) {
-        CacheItem<Project> cachedProject = projectCache.get(key);
+    public IProject get(String key) {
+        CacheItem<IProject> cachedProject = projectCache.get(key);
         if (cachedProject != null) {
             if (LOG.isInfoEnabled()) {
                 LOG.info("Found project from cache: " + cachedProject.getItem().getName());
@@ -40,7 +41,7 @@ public class ProjectCacheServiceImpl implements CacheService<Project> {
     }
 
     @Override
-    public void set(String key, Project value) {
+    public void set(String key, IProject value) {
         projectCache.put(key, new CacheItem<>(value, getLastModified(key)));
     }
 

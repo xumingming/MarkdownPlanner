@@ -23,7 +23,7 @@ import org.xumingmingv.markdownplanner.Utils;
 public class PlanServiceImpl implements PlanService {
     private static final Logger LOG = LoggerFactory.getLogger(PlanServiceImpl.class);
     @Autowired
-    private CacheService<Project> projectCacheService;
+    private CacheService<IProject> projectCacheService;
     @Autowired
     private ConfigService configService;
     public IProject getProject(String filePath) {
@@ -32,7 +32,7 @@ public class PlanServiceImpl implements PlanService {
 
     public IProject getProject(String filePath, String man, String status, List<String> keywords, boolean reverse) {
         // get from cache
-        Project fullProject = null;
+        IProject fullProject = null;
         if (configService.isCacheEnabled()) {
             fullProject = projectCacheService.get(filePath);
         }
@@ -54,12 +54,13 @@ public class PlanServiceImpl implements PlanService {
                         summaryProject.addProject(readProjectFromDisk(f.getAbsolutePath()));
                     });
 
-                return summaryProject;
+                fullProject = summaryProject;
             } else {
                 fullProject = readProjectFromDisk(filePath);
-            }
 
-            projectCacheService.set(filePath, fullProject);
+                // 只有具体的project才加入缓存
+                projectCacheService.set(filePath, fullProject);
+            }
         }
 
         return filterProject(fullProject, man, status, keywords, reverse);
@@ -112,9 +113,9 @@ public class PlanServiceImpl implements PlanService {
         Utils.writeFile(filePath, Joiner.on("\n").join(lines));
     }
 
-    private Project filterProject(Project fullProject, String man,
+    private IProject filterProject(IProject fullProject, String man,
         String status, List<String> keywords, boolean reverse) {
-        Project project = fullProject;
+        IProject project = fullProject;
         if (status != null) {
             switch (status) {
                 case "Completed":
@@ -139,7 +140,7 @@ public class PlanServiceImpl implements PlanService {
         return project;
     }
 
-    public void setProjectCacheService(CacheService<Project> projectCacheService) {
+    public void setProjectCacheService(CacheService<IProject> projectCacheService) {
         this.projectCacheService = projectCacheService;
     }
 }

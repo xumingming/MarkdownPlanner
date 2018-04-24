@@ -98,4 +98,79 @@ public interface IProject {
      * @return
      */
     List<Vacation> getVacations();
+
+    default Project hideCompleted() {
+        return new Project(
+            getName(),
+            getProjectStartDate(),
+            getTasks().stream().filter(x -> !x.isCompleted()).collect(Collectors.toList()),
+            getVacations()
+        );
+    }
+
+    default Project hideNotCompleted() {
+        return new Project(
+            getName(),
+            getProjectStartDate(),
+            getTasks().stream().filter(x -> x.isCompleted()).collect(Collectors.toList()),
+            getVacations()
+        );
+    }
+
+    default Project onlyShowTaskForUser(String user) {
+        return new Project(
+            getName(),
+            getProjectStartDate(),
+            getTasks().stream().filter(x -> x.getOwner().equals(user)).collect(Collectors.toList()),
+            getVacations()
+        );
+    }
+
+    default Project filterKeyword(String keyword) {
+        return filterKeyword(keyword, false);
+    }
+
+    default Project filterKeywords(List<String> keywords, boolean reverse) {
+        return new Project(
+            getName(),
+            getProjectStartDate(),
+            getTasks().stream()
+                .filter(x -> {
+                    boolean tmp = true;
+                    for (String keyword : keywords) {
+                        tmp = x.getName().toLowerCase().contains(keyword.toLowerCase());
+                        if (tmp) {
+                            break;
+                        }
+                    }
+
+                    if (reverse) {
+                        return !tmp;
+                    } else {
+                        return tmp;
+                    }
+                })
+                .collect(Collectors.toList()),
+            getVacations()
+        );
+    }
+
+    default Project filterKeyword(String keyword, boolean reverse) {
+        return new Project(
+            getName(),
+            getProjectStartDate(),
+            getTasks().stream()
+                .filter(x -> {
+                    boolean tmp = x.getName().toLowerCase().contains(keyword.toLowerCase());
+                    if (reverse) {
+                        return !tmp;
+                    } else {
+                        return tmp;
+                    }
+                })
+                .collect(Collectors.toList()),
+            getVacations()
+        );
+    }
+
 }
