@@ -98,6 +98,18 @@ public class Project implements IProject {
     }
 
     private void init() {
+        // 把状态复原
+        for (int i = tasks.size() - 1; i >= 0; i--) {
+            Task task = tasks.get(i);
+            if (task.isComposite()) {
+                tasks.remove(i);
+            } else {
+                task.setEndOffset(0);
+                task.setId(null);
+                task.setParentId(null);
+            }
+        }
+
         // 初始化一下 ProjectStartDate
         initProjectStartDateForTasks();
         // 按照用户对原子任务进行分组
@@ -112,6 +124,10 @@ public class Project implements IProject {
     }
 
     void treenify() {
+        if (this.tasks.isEmpty()) {
+            return;
+        }
+
         List<Task> tasks = new ArrayList<>();
 
         // 先建一个“根”任务
@@ -363,6 +379,79 @@ public class Project implements IProject {
         ret.setActualCost(actualCost);
         ret.setDate(currentDate);
         return ret;
+    }
+
+    @Override
+    public IProject filterUser(String user) {
+        return new Project(
+            name,
+            projectStartDate,
+            tasks.stream().filter(x -> x.getOwner().equals(user)).collect(Collectors.toList()),
+            vacations
+        );
+    }
+
+    public IProject filterKeywords(List<String> keywords, boolean reverse) {
+        return new Project(
+            name,
+            projectStartDate,
+            tasks.stream()
+                .filter(x -> {
+                    boolean tmp = true;
+                    for (String keyword : keywords) {
+                        tmp = x.getName().toLowerCase().contains(keyword.toLowerCase());
+                        if (tmp) {
+                            break;
+                        }
+                    }
+
+                    if (reverse) {
+                        return !tmp;
+                    } else {
+                        return tmp;
+                    }
+                })
+                .collect(Collectors.toList()),
+            getVacations()
+        );
+    }
+
+    public IProject filterKeyword(String keyword, boolean reverse) {
+        return new Project(
+            name,
+            projectStartDate,
+            tasks.stream()
+                .filter(x -> {
+                    boolean tmp = x.getName().toLowerCase().contains(keyword.toLowerCase());
+                    if (reverse) {
+                        return !tmp;
+                    } else {
+                        return tmp;
+                    }
+                })
+                .collect(Collectors.toList()),
+            getVacations()
+        );
+    }
+
+    @Override
+    public Project hideCompleted() {
+        return new Project(
+            getName(),
+            getProjectStartDate(),
+            getTasks().stream().filter(x -> !x.isCompleted()).collect(Collectors.toList()),
+            getVacations()
+        );
+    }
+
+    @Override
+    public Project hideNotCompleted() {
+        return new Project(
+            getName(),
+            getProjectStartDate(),
+            getTasks().stream().filter(x -> x.isCompleted()).collect(Collectors.toList()),
+            getVacations()
+        );
     }
 
     @Data

@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 import org.xumingmingv.markdownplanner.model.task.CompositeTask;
 import org.xumingmingv.markdownplanner.model.task.Task;
 
+/**
+ * 项目
+ */
 public interface IProject {
     /**
      * 项目的名字
@@ -99,78 +102,36 @@ public interface IProject {
      */
     List<Vacation> getVacations();
 
-    default Project hideCompleted() {
-        return new Project(
-            getName(),
-            getProjectStartDate(),
-            getTasks().stream().filter(x -> !x.isCompleted()).collect(Collectors.toList()),
-            getVacations()
-        );
-    }
+    /**
+     * 隐藏掉已经完成的任务
+     * @return
+     */
+    IProject hideCompleted();
 
-    default Project hideNotCompleted() {
-        return new Project(
-            getName(),
-            getProjectStartDate(),
-            getTasks().stream().filter(x -> x.isCompleted()).collect(Collectors.toList()),
-            getVacations()
-        );
-    }
+    /**
+     * 隐藏掉没有完成的任务
+     * @return
+     */
+    IProject hideNotCompleted();
 
-    default Project onlyShowTaskForUser(String user) {
-        return new Project(
-            getName(),
-            getProjectStartDate(),
-            getTasks().stream().filter(x -> x.getOwner().equals(user)).collect(Collectors.toList()),
-            getVacations()
-        );
-    }
+    /**
+     * 过滤出指定用户的任务
+     * @param user
+     * @return
+     */
+    IProject filterUser(String user);
 
-    default Project filterKeyword(String keyword) {
+    /**
+     * 过滤关键词
+     * @param keywords
+     * @param reverse
+     * @return
+     */
+    IProject filterKeywords(List<String> keywords, boolean reverse);
+
+    IProject filterKeyword(String keyword, boolean reverse);
+
+    default IProject filterKeyword(String keyword) {
         return filterKeyword(keyword, false);
     }
-
-    default Project filterKeywords(List<String> keywords, boolean reverse) {
-        return new Project(
-            getName(),
-            getProjectStartDate(),
-            getTasks().stream()
-                .filter(x -> {
-                    boolean tmp = true;
-                    for (String keyword : keywords) {
-                        tmp = x.getName().toLowerCase().contains(keyword.toLowerCase());
-                        if (tmp) {
-                            break;
-                        }
-                    }
-
-                    if (reverse) {
-                        return !tmp;
-                    } else {
-                        return tmp;
-                    }
-                })
-                .collect(Collectors.toList()),
-            getVacations()
-        );
-    }
-
-    default Project filterKeyword(String keyword, boolean reverse) {
-        return new Project(
-            getName(),
-            getProjectStartDate(),
-            getTasks().stream()
-                .filter(x -> {
-                    boolean tmp = x.getName().toLowerCase().contains(keyword.toLowerCase());
-                    if (reverse) {
-                        return !tmp;
-                    } else {
-                        return tmp;
-                    }
-                })
-                .collect(Collectors.toList()),
-            getVacations()
-        );
-    }
-
 }

@@ -2,6 +2,7 @@ package org.xumingmingv.markdownplanner.web;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import lombok.Data;
 import org.xumingmingv.markdownplanner.model.UserStat;
@@ -18,9 +19,11 @@ public class ProjectVO {
     private TaskVO rootTask;
 
     public TaskVO getRootTask() {
-        return this.tasks.stream()
+        Optional<TaskVO> ret = this.tasks.stream()
             .filter(t -> t.getId() == 0)
-            .findFirst().get();
+            .findFirst();
+
+        return ret.isPresent() ? ret.get() : null;
     }
 
     public UserStat getUserStat(String user) {

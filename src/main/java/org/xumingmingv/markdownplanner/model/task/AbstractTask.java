@@ -10,9 +10,9 @@ import lombok.Setter;
 @Setter
 public abstract class AbstractTask implements Task {
     /** 任务的ID */
-    protected int id;
+    protected Integer id;
     /** 父任务的ID */
-    protected int parentId;
+    protected Integer parentId = 0;
     /** 任务说属于的类别 */
     protected Header header;
     /** 项目开始时间 */

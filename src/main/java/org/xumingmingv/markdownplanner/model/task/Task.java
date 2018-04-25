@@ -11,23 +11,23 @@ public interface Task {
      * 任务的ID
      * @return
      */
-    int getId();
+    Integer getId();
 
     /**
      * 设置ID
      */
-    void setId(int id);
+    void setId(Integer id);
 
     /**
      * 父任务的ID
      * @return
      */
-    int getParentId();
+    Integer getParentId();
 
     /**
      * 设置父任务ID
      */
-    void setParentId(int parentId);
+    void setParentId(Integer parentId);
 
     /**
      * 项目开始时间

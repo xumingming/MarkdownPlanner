@@ -131,7 +131,7 @@ public class PlanServiceImpl implements PlanService {
         }
 
         if (StringUtils.isNotBlank(man)) {
-            project = project.onlyShowTaskForUser(man);
+            project = project.filterUser(man);
         }
 
         if (keywords != null && !keywords.isEmpty()) {

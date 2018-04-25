@@ -1,5 +1,6 @@
 package org.xumingmingv.markdownplanner.web;
 
+import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 import org.xumingmingv.markdownplanner.model.IProject;
@@ -57,8 +58,10 @@ public class Converters {
         );
         projectVO.setTotalManDays(project.getTotalStat().getTotalCost() / 2);
         projectVO.setMen(project.getMen());
-        projectVO.setProjectStartDate(project.getProjectStartDate().toString());
-        projectVO.setProjectEndDate(project.getProjectEndDate().toString());
+        LocalDate projectStartDate = project.getProjectStartDate();
+        projectVO.setProjectStartDate(projectStartDate == null ? null : projectStartDate.toString());
+        LocalDate projectEndDate = project.getProjectEndDate();
+        projectVO.setProjectEndDate(projectEndDate == null ? null : projectEndDate.toString());
         projectVO.setUserStats(project.getUserStats());
 
         return projectVO;
