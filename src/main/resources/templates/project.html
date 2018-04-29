@@ -173,8 +173,8 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="man : ${fullProject.men}"
-                            th:with="stat=${fullProject.getUserStat(man)}">
+                        <tr th:each="man : ${project.men}"
+                            th:with="stat=${project.getUserStat(man)}">
                             <td th:text="${man}"></td>
                             <td th:text="${stat.totalCost / 2}"></td>
                             <td th:text="${stat.finishedCost / 2}"></td>
@@ -188,7 +188,7 @@
                         </tr>
 
                         <!-- 总状态 -->
-                        <tr th:with="stat=${fullProject.getTotalStat()}, rootTask=${project.rootTask}">
+                        <tr th:with="stat=${project.getTotalStat()}, rootTask=${project.rootTask}">
                             <td th:text="${stat.user}"></td>
                             <td th:text="${stat.totalCost / 2}"></td>
                             <td th:text="${stat.finishedCost / 2}"></td>
