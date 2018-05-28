@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import org.xumingmingv.markdownplanner.model.task.CompositeTask;
 import org.xumingmingv.markdownplanner.model.task.Task;
@@ -209,6 +210,19 @@ public class Project implements IProject {
                     Optional<Integer> usedCost = childrenTasks.stream()
                         .map(Task::getUsedCost)
                         .reduce((a, b) -> a + b);
+
+                    Preconditions.checkState(
+                        startOffset.isPresent(),
+                        "startOffset calculate failed, task: " + task.getName()
+                    );
+                    Preconditions.checkState(
+                        endOffset.isPresent(),
+                        "endOffset calculate failed, task: " + task.getName()
+                    );
+                    Preconditions.checkState(
+                        usedCost.isPresent(),
+                        "usedCost calculate failed, task: " + task.getName()
+                    );
 
                     task.setStartOffset(startOffset.get());
                     task.setEndOffset(endOffset.get());
