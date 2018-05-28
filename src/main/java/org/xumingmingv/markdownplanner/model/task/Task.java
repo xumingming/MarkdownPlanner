@@ -85,22 +85,22 @@ public interface Task {
     /**
      * 任务开始节点
      */
-    int getStartOffset();
+    Integer getStartOffset();
 
     /**
      * 设置startOffset
      */
-    void setStartOffset(int startOffset);
+    void setStartOffset(Integer startOffset);
 
     /**
      * 设置endOffset
      */
-    void setEndOffset(int endOffset);
+    void setEndOffset(Integer endOffset);
 
     /**
      *  任务结束节点
      */
-    int getEndOffset();
+    Integer getEndOffset();
 
     /**
      * 是否是复合任务
@@ -122,7 +122,7 @@ public interface Task {
      * 任务的属性是否已经完全设置好了
      */
     default boolean isFullyPopulated() {
-        return getEndOffset() > 0;
+        return getEndOffset() != null;
     }
 
     /**

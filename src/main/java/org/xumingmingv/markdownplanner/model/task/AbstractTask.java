@@ -20,8 +20,8 @@ public abstract class AbstractTask implements Task {
     /** task name */
     protected String name;
     /** offset from ProjectStartDate(Unit: HalfDay) */
-    protected int startOffset;
-    protected int endOffset;
+    protected Integer startOffset;
+    protected Integer endOffset;
     /** 已经消耗掉的Cost */
     protected int usedCost;
 }

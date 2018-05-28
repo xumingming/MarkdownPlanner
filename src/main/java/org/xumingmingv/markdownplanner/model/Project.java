@@ -241,7 +241,7 @@ public class Project implements IProject {
 
     private List<Task> getNotInitedTasks() {
         return tasks.stream()
-                .filter(t1 -> t1.getEndOffset() == 0)
+                .filter(t1 -> !t1.isFullyPopulated())
                 .collect(Collectors.toList());
     }
 
