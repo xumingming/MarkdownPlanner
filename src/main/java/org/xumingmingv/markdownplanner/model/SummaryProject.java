@@ -79,6 +79,9 @@ public class SummaryProject implements IProject {
         rootTask.setId(0);
         rootTask.setParentId(-1);
 
+        Integer rootStart = 0;
+        Integer rootEnd = 0;
+
         for (IProject project : projects) {
             for (Task task : project.getTasks()) {
                 int origId = task.getId();
@@ -94,10 +97,21 @@ public class SummaryProject implements IProject {
                 if (!(task instanceof CompositeTask)) {
                     rootTask.addOwnerCost(task.getOwner(), task.getCost(), task.getFinishedCost());
                 }
+
+                if (rootStart == 0 || task.getStartOffset() < rootStart) {
+                    rootStart = task.getStartOffset();
+                }
+
+                if (task.getEndOffset() > rootEnd) {
+                    rootEnd = task.getEndOffset();
+                }
             }
 
             projectIdx++;
         }
+
+        rootTask.setStartOffset(rootStart);
+        rootTask.setEndOffset(rootEnd);
 
         ret.add(0, rootTask);
 
